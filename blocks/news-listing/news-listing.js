@@ -2,8 +2,6 @@ import { getMetadata } from '../../scripts/aem.js';
 import { isAuthorEnvironment } from '../../scripts/scripts.js';
 import { getHostname } from '../../scripts/utils.js';
 
-const GRAPHQL_NEWS_BY_FOLDER_QUERY = '/graphql/execute.json/ref-demo-eds/GetNewsFromFolder';
-
 const CONFIG = {
   WRAPPER_SERVICE_URL: 'https://3635370-refdemoapigateway-stage.adobeioruntime.net/api/v1/web/ref-demo-api-gateway/fetch-cf',
 };
@@ -30,31 +28,37 @@ function normalizeNewsItem(item, isAuthorEnv) {
 
   const description = item?.description?.plaintext
     || item?.description?.html
+    || item?.shortDescription?.plaintext
+    || item?.description?.html
     || item?.description
     || '';
 
   const category = Array.isArray(item?.category)
     ? item.category[0]
-    : (item?.category || '');
+    : (item?.category || item?.newsCategory || '');
 
   return {
     id: item?._path || crypto.randomUUID(),
     title: item?.title || 'Untitled',
     description: typeof description === 'string' ? description : '',
     category: typeof category === 'string' ? category : '',
-    slug: item?.slug || '',
+    slug: item?.slug || item?.urlSlug || '',
     image,
   };
 }
 
-function extractNewsItems(payload, isAuthorEnv) {
+function extractNewsItems(payload, isAuthorEnv, configuredListKey) {
   const data = payload?.data;
   if (!data || typeof data !== 'object') return [];
-  const firstArray = Object.values(data)
-    .map((value) => value?.items)
-    .find((items) => Array.isArray(items));
-  if (!firstArray) return [];
-  return firstArray.map((item) => normalizeNewsItem(item, isAuthorEnv));
+  let items = [];
+  if (configuredListKey && data[configuredListKey]?.items) {
+    items = data[configuredListKey].items;
+  } else {
+    items = Object.values(data)
+      .map((value) => value?.items)
+      .find((candidate) => Array.isArray(candidate)) || [];
+  }
+  return items.map((item) => normalizeNewsItem(item, isAuthorEnv));
 }
 
 function resolveNewsLink(slug, detailBasePath) {
@@ -94,17 +98,19 @@ function renderNews(newsItems, config, container) {
   });
 }
 
-async function fetchNewsByFolder(folderPath) {
+async function fetchNewsByFolder(folderPath, queryName, responseListKey) {
   const hostnameFromPlaceholders = await getHostname();
   const hostname = hostnameFromPlaceholders || getMetadata('hostname');
   const aemauthorurl = getMetadata('authorurl') || '';
   const aempublishurl = hostname?.replace('author', 'publish')?.replace(/\/$/, '') || '';
   const isAuthor = isAuthorEnvironment();
   const decodedFolderPath = decodeURIComponent(folderPath || '');
+  const query = queryName || 'GetNewsFromFolder';
+  const graphQlEndpoint = `/graphql/execute.json/ref-demo-eds/${query}`;
 
   const requestConfig = isAuthor
     ? {
-      url: `${aemauthorurl}${GRAPHQL_NEWS_BY_FOLDER_QUERY};path=${decodedFolderPath};ts=${Date.now()}`,
+      url: `${aemauthorurl}${graphQlEndpoint};path=${decodedFolderPath};ts=${Date.now()}`,
       method: 'GET',
       headers: { 'Content-Type': 'application/json' },
     }
@@ -113,7 +119,7 @@ async function fetchNewsByFolder(folderPath) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        graphQLPath: `${aempublishurl}${GRAPHQL_NEWS_BY_FOLDER_QUERY}`,
+        graphQLPath: `${aempublishurl}${graphQlEndpoint}`,
         cfPath: decodedFolderPath,
         variation: `main;ts=${Date.now()}`,
       }),
@@ -126,11 +132,11 @@ async function fetchNewsByFolder(folderPath) {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed news GraphQL request: ${response.status}`);
+    throw new Error(`Failed news GraphQL request (${query}): ${response.status}`);
   }
 
   const payload = await response.json();
-  return extractNewsItems(payload, isAuthor);
+  return extractNewsItems(payload, isAuthor, responseListKey);
 }
 
 export default async function decorate(block) {
@@ -141,6 +147,8 @@ export default async function decorate(block) {
   let ctaLabel = 'Ver detalhes';
   let detailBasePath = '/news';
   let emptyStateText = 'Nenhuma notícia encontrada.';
+  let queryName = 'GetNewsFromFolder';
+  let responseListKey = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -162,6 +170,10 @@ export default async function decorate(block) {
       case 'detailbasepath': detailBasePath = value; break;
       case 'empty state text':
       case 'emptystatetext': emptyStateText = value; break;
+      case 'query name':
+      case 'queryname': queryName = value; break;
+      case 'response list key':
+      case 'responselistkey': responseListKey = value; break;
       default: break;
     }
   });
@@ -183,7 +195,7 @@ export default async function decorate(block) {
   }
 
   try {
-    const items = await fetchNewsByFolder(contentFragmentFolder);
+    const items = await fetchNewsByFolder(contentFragmentFolder, queryName, responseListKey);
     renderNews(items.slice(0, maxItems), {
       ctaLabel,
       detailBasePath,

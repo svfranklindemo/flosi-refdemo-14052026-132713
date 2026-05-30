@@ -51,6 +51,19 @@ function extractFolderChildren(folderJson) {
       .filter((path) => typeof path === 'string' && path.startsWith('/content/dam/'));
   }
 
+  if (folderJson?.entities && typeof folderJson.entities === 'object') {
+    return Object.values(folderJson.entities)
+      .map((entity) => entity?.properties?.path
+        || entity?.properties?.['jcr:path']
+        || entity?.path
+        || entity?.name)
+      .filter((path) => typeof path === 'string' && path.includes('/content/dam/'))
+      .map((path) => {
+        const match = path.match(/\/content\/dam\/[^\s"'<>]+/);
+        return match ? match[0] : path;
+      });
+  }
+
   if (Array.isArray(folderJson?.children)) {
     return folderJson.children
       .map((child) => child?.path || child?.properties?.path || child?.properties?.['jcr:path'])
@@ -66,6 +79,10 @@ function collectDamPathsRecursively(node, acc = new Set()) {
   Object.entries(node).forEach(([key, value]) => {
     if (typeof key === 'string' && key.startsWith('/content/dam/')) {
       acc.add(key);
+    }
+    if (typeof value === 'string' && value.includes('/content/dam/')) {
+      const matches = value.match(/\/content\/dam\/[^\s"'<>]+/g) || [];
+      matches.forEach((match) => acc.add(match.replace(/[),.;]+$/, '')));
     }
     if (value && typeof value === 'object') {
       collectDamPathsRecursively(value, acc);
@@ -189,7 +206,14 @@ async function fetchNewsFromFolder(folderPath) {
   const items = results
     .filter((result) => result.status === 'fulfilled' && result.value)
     .map((result) => result.value);
-  return { items, debug: { normalized, childrenCount: children.length } };
+  return {
+    items,
+    debug: {
+      normalized,
+      childrenCount: children.length,
+      rootKeys: Object.keys(folderJson || {}).slice(0, 8).join(','),
+    },
+  };
 }
 
 export default async function decorate(block) {
@@ -246,7 +270,7 @@ export default async function decorate(block) {
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement('p', 'news-listing-error');
-      info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount}`;
+      info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount} | keys=${debug.rootKeys}`;
       list.append(info);
     }
   } catch (e) {

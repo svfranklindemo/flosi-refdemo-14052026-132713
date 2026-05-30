@@ -61,6 +61,19 @@ function extractFolderChildren(folderJson) {
     .filter((key) => key.startsWith('/content/dam/'));
 }
 
+function collectDamPathsRecursively(node, acc = new Set()) {
+  if (!node || typeof node !== 'object') return acc;
+  Object.entries(node).forEach(([key, value]) => {
+    if (typeof key === 'string' && key.startsWith('/content/dam/')) {
+      acc.add(key);
+    }
+    if (value && typeof value === 'object') {
+      collectDamPathsRecursively(value, acc);
+    }
+  });
+  return acc;
+}
+
 function resolveChildPath(baseFolder, rawPath) {
   if (!rawPath) return null;
   if (rawPath.startsWith('/content/dam/')) return rawPath;
@@ -143,14 +156,21 @@ async function fetchNewsFromFolder(folderPath) {
   const normalized = normalizeFolderPath(folderPath);
   const folderJson = await fetchJsonFirst([
     ensureJsonPath(normalized),
+    ensureJsonPath(`${normalized}/`),
     ensureJsonPath(`/api/assets${normalized}`),
+    ensureJsonPath(`/api/assets${normalized}/`),
+    `${normalized}.2.json`,
+    `${normalized}.3.json`,
   ]);
 
   if (!folderJson) throw new Error('Folder not found or not readable');
 
-  const children = extractFolderChildren(folderJson)
+  const directChildren = extractFolderChildren(folderJson);
+  const deepChildren = Array.from(collectDamPathsRecursively(folderJson));
+  const children = [...new Set([...directChildren, ...deepChildren])]
     .map((child) => resolveChildPath(normalized, child))
     .filter(Boolean)
+    .filter((path) => path !== normalized)
     .filter((path) => !path.endsWith('/jcr:content'));
 
   const results = await Promise.allSettled(

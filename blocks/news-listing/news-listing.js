@@ -5,6 +5,8 @@ function createElement(tag, className, html) {
   return element;
 }
 
+const DEBUG_VERSION = 'news-listing-v3';
+
 function getConfigValue(valueCell) {
   const link = valueCell.querySelector('a');
   return (link?.getAttribute('title') || link?.textContent || valueCell.textContent || '').trim();
@@ -374,6 +376,7 @@ export default async function decorate(block) {
     if (!items.length) {
       const info = createElement('p', 'news-listing-error');
       info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount} | source=${debug.source} | qbStatus=${debug.qbStatus} | qbTotal=${debug.qbTotal} | qbSample=${debug.qbSample} | qbUrl=${debug.qbUrl}`;
+      info.textContent += ` | debugVersion=${DEBUG_VERSION}`;
       list.append(info);
     }
   } catch (e) {

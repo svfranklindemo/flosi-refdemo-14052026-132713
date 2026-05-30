@@ -93,7 +93,9 @@ function extractFolderChildren(folderJson) {
   }
 
   return Object.keys(folderJson || {})
-    .filter((key) => key.startsWith('/content/dam/'));
+    .filter((key) => key && !key.startsWith('jcr:') && !key.startsWith(':'))
+    .filter((key) => key !== 'metadata' && key !== 'renditions')
+    .map((key) => (key.startsWith('/content/dam/') ? key : key));
 }
 
 function collectDamPathsRecursively(node, acc = new Set()) {

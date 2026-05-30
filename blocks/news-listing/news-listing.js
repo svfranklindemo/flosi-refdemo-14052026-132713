@@ -47,6 +47,21 @@ function normalizeNewsItem(item, isAuthorEnv) {
   };
 }
 
+function normalizeCfData(item) {
+  return normalizeNewsItem({
+    _path: item.path,
+    title: item.title,
+    description: item.description,
+    shortDescription: item.shortDescription,
+    media: item.media,
+    image: item.image,
+    category: item.category,
+    newsCategory: item.newsCategory,
+    slug: item.slug,
+    urlSlug: item.urlSlug,
+  }, isAuthorEnvironment());
+}
+
 function extractNewsItems(payload, isAuthorEnv, configuredListKey) {
   const data = payload?.data;
   if (!data || typeof data !== 'object') return [];
@@ -139,6 +154,81 @@ async function fetchNewsByFolder(folderPath, queryName, responseListKey) {
   return extractNewsItems(payload, isAuthor, responseListKey);
 }
 
+function ensureJsonPath(path) {
+  if (!path) return '';
+  return path.endsWith('.json') ? path : `${path}.json`;
+}
+
+function readFieldValue(field) {
+  if (field === null || field === undefined) return '';
+  if (typeof field === 'string') return field;
+  if (typeof field === 'number') return String(field);
+  if (typeof field === 'object') {
+    return field.plaintext || field.value || field._path || '';
+  }
+  return '';
+}
+
+function extractCfCoreData(cfJson) {
+  const modelData = cfJson?.['jcr:content']?.data?.master || cfJson?.data?.master || {};
+  const elements = cfJson?.elements || {};
+  const title = modelData.title || readFieldValue(elements.title) || cfJson.title || '';
+  const description = modelData.description || readFieldValue(elements.description) || '';
+  const shortDescription = modelData.shortDescription || readFieldValue(elements.shortDescription) || '';
+  const category = modelData.category || readFieldValue(elements.category) || '';
+  const slug = modelData.slug || readFieldValue(elements.slug) || '';
+  const mediaValue = modelData.media || readFieldValue(elements.media);
+
+  return {
+    path: cfJson?.[':path'] || cfJson?._path || modelData?.[':path'] || '',
+    title,
+    description,
+    shortDescription,
+    category,
+    slug,
+    media: mediaValue ? { _publishUrl: mediaValue, _authorUrl: mediaValue, _dynamicUrl: mediaValue } : null,
+  };
+}
+
+function getFolderChildren(folderJson) {
+  if (Array.isArray(folderJson?.entities)) {
+    return folderJson.entities
+      .map((entity) => entity?.properties?.path || entity?.path)
+      .filter((path) => typeof path === 'string' && path.startsWith('/content/dam/'));
+  }
+
+  return Object.keys(folderJson || {})
+    .filter((key) => key && !key.startsWith(':') && !key.startsWith('jcr:'))
+    .map((key) => key.startsWith('/') ? key : null)
+    .filter(Boolean);
+}
+
+async function fetchNewsFromDamFolder(folderPath) {
+  const folderResponse = await fetch(ensureJsonPath(folderPath));
+  if (!folderResponse.ok) {
+    throw new Error(`Failed DAM folder request: ${folderResponse.status}`);
+  }
+
+  const folderJson = await folderResponse.json();
+  const childPaths = getFolderChildren(folderJson);
+  const cfPaths = childPaths.filter((path) => !path.endsWith('/jcr:content'));
+
+  const results = await Promise.allSettled(
+    cfPaths.map(async (path) => {
+      const response = await fetch(ensureJsonPath(path));
+      if (!response.ok) return null;
+      const json = await response.json();
+      const core = extractCfCoreData(json);
+      if (!core.title) return null;
+      return normalizeCfData(core);
+    }),
+  );
+
+  return results
+    .filter((result) => result.status === 'fulfilled' && result.value)
+    .map((result) => result.value);
+}
+
 export default async function decorate(block) {
   let title = 'Últimas Notícias';
   let subtitle = 'Confira as notícias mais recentes';
@@ -147,7 +237,7 @@ export default async function decorate(block) {
   let ctaLabel = 'Ver detalhes';
   let detailBasePath = '/news';
   let emptyStateText = 'Nenhuma notícia encontrada.';
-  let queryName = 'GetNewsFromFolder';
+  let queryName = '';
   let responseListKey = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
@@ -195,7 +285,12 @@ export default async function decorate(block) {
   }
 
   try {
-    const items = await fetchNewsByFolder(contentFragmentFolder, queryName, responseListKey);
+    let items = [];
+    if (queryName) {
+      items = await fetchNewsByFolder(contentFragmentFolder, queryName, responseListKey);
+    } else {
+      items = await fetchNewsFromDamFolder(contentFragmentFolder);
+    }
     renderNews(items.slice(0, maxItems), {
       ctaLabel,
       detailBasePath,

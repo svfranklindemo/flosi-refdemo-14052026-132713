@@ -59,14 +59,41 @@ async function fetchAssetsViaQueryBuilder(folderPath) {
   const url = `/bin/querybuilder.json?${params.toString()}`;
   try {
     const response = await fetch(url);
-    if (!response.ok) return [];
+    if (!response.ok) {
+      return {
+        paths: [],
+        debug: {
+          qbUrl: url,
+          qbStatus: response.status,
+          qbTotal: 0,
+          qbSample: '',
+        },
+      };
+    }
     const json = await response.json();
     const hits = Array.isArray(json?.hits) ? json.hits : [];
-    return hits
+    const paths = hits
       .map((hit) => hit?.path)
       .filter((path) => typeof path === 'string' && path.startsWith('/content/dam/'));
+    return {
+      paths,
+      debug: {
+        qbUrl: url,
+        qbStatus: response.status,
+        qbTotal: Number.parseInt(json?.total, 10) || paths.length || 0,
+        qbSample: paths.slice(0, 3).join(','),
+      },
+    };
   } catch (e) {
-    return [];
+    return {
+      paths: [],
+      debug: {
+        qbUrl: url,
+        qbStatus: 'fetch-error',
+        qbTotal: 0,
+        qbSample: e?.message || '',
+      },
+    };
   }
 }
 
@@ -210,7 +237,8 @@ function renderNews(newsItems, config, container) {
 
 async function fetchNewsFromFolder(folderPath) {
   const normalized = normalizeFolderPath(folderPath);
-  const resolvedChildren = await fetchAssetsViaQueryBuilder(normalized);
+  const qbResult = await fetchAssetsViaQueryBuilder(normalized);
+  const resolvedChildren = qbResult.paths;
 
   const results = await Promise.allSettled(
     resolvedChildren.map(async (path) => {
@@ -235,6 +263,10 @@ async function fetchNewsFromFolder(folderPath) {
       childrenCount: resolvedChildren.length,
       source: 'querybuilder-author',
       rootKeys: '',
+      qbUrl: qbResult.debug.qbUrl,
+      qbStatus: qbResult.debug.qbStatus,
+      qbTotal: qbResult.debug.qbTotal,
+      qbSample: qbResult.debug.qbSample,
     },
   };
 }
@@ -322,7 +354,7 @@ export default async function decorate(block) {
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement('p', 'news-listing-error');
-      info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount} | source=${debug.source} | keys=${debug.rootKeys}`;
+      info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount} | source=${debug.source} | qbStatus=${debug.qbStatus} | qbTotal=${debug.qbTotal} | qbSample=${debug.qbSample} | qbUrl=${debug.qbUrl}`;
       list.append(info);
     }
   } catch (e) {

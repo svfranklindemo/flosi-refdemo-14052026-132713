@@ -22,7 +22,10 @@ function ensureJsonPath(path) {
 }
 
 function normalizeFolderPath(path) {
-  return String(path || '').trim().replace(/\.json$/i, '');
+  return String(path || '')
+    .trim()
+    .replace(/\.json$/i, '')
+    .replace(/\/+$/g, '');
 }
 
 async function fetchJsonFirst(urls) {
@@ -41,7 +44,10 @@ async function fetchJsonFirst(urls) {
 function extractFolderChildren(folderJson) {
   if (Array.isArray(folderJson?.entities)) {
     return folderJson.entities
-      .map((entity) => entity?.properties?.path || entity?.properties?.['jcr:path'] || entity?.path)
+      .map((entity) => entity?.properties?.path
+        || entity?.properties?.['jcr:path']
+        || entity?.path
+        || entity?.name)
       .filter((path) => typeof path === 'string' && path.startsWith('/content/dam/'));
   }
 
@@ -53,6 +59,13 @@ function extractFolderChildren(folderJson) {
 
   return Object.keys(folderJson || {})
     .filter((key) => key.startsWith('/content/dam/'));
+}
+
+function resolveChildPath(baseFolder, rawPath) {
+  if (!rawPath) return null;
+  if (rawPath.startsWith('/content/dam/')) return rawPath;
+  const clean = rawPath.replace(/^\/+/, '');
+  return `${baseFolder}/${clean}`;
 }
 
 function readFieldValue(field) {
@@ -136,6 +149,8 @@ async function fetchNewsFromFolder(folderPath) {
   if (!folderJson) throw new Error('Folder not found or not readable');
 
   const children = extractFolderChildren(folderJson)
+    .map((child) => resolveChildPath(normalized, child))
+    .filter(Boolean)
     .filter((path) => !path.endsWith('/jcr:content'));
 
   const results = await Promise.allSettled(
@@ -151,9 +166,10 @@ async function fetchNewsFromFolder(folderPath) {
     }),
   );
 
-  return results
+  const items = results
     .filter((result) => result.status === 'fulfilled' && result.value)
     .map((result) => result.value);
+  return { items, debug: { normalized, childrenCount: children.length } };
 }
 
 export default async function decorate(block) {
@@ -206,8 +222,13 @@ export default async function decorate(block) {
   }
 
   try {
-    const items = await fetchNewsFromFolder(contentFragmentFolder);
+    const { items, debug } = await fetchNewsFromFolder(contentFragmentFolder);
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
+    if (!items.length) {
+      const info = createElement('p', 'news-listing-error');
+      info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount}`;
+      list.append(info);
+    }
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('Error loading news listing:', e);

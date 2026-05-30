@@ -73,7 +73,11 @@ async function fetchAssetsViaQueryBuilder(folderPath) {
     const json = await response.json();
     const hits = Array.isArray(json?.hits) ? json.hits : [];
     const paths = hits
-      .map((hit) => hit?.path)
+      .map((hit) => hit?.path || hit?.['jcr:path'] || hit?.['@path'] || hit?.[':path'])
+      .map((path) => {
+        if (typeof path !== 'string') return '';
+        return path.replace(/\/jcr:content$/i, '');
+      })
       .filter((path) => typeof path === 'string' && path.startsWith('/content/dam/'));
     return {
       paths,

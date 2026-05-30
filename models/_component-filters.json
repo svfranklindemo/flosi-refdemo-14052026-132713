@@ -5,23 +5,30 @@
       "section"
     ]
   },
-   {
+  {
     "id": "section",
     "components": [
+      "accordion",
       "button",
       "cards",
       "carousel",
       "columns",
       "contentfragment",
+      "dm-openapi",
       "find-a-doctor",
       "dm-asset",
       "dm-template",
+      "embed-adaptive-form",
+      "forex",
+      "form",
       "fragment",
       "hero",
       "iframe",
       "image",
       "news-listing",
+      "quote",
       "search",
+      "tabs",
       "teaser",
       "text",
       "title",

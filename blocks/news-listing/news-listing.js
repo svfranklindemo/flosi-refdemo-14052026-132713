@@ -41,6 +41,28 @@ async function fetchJsonFirst(urls) {
   return null;
 }
 
+async function fetchAssetsViaQueryBuilder(folderPath) {
+  const params = new URLSearchParams({
+    path: folderPath,
+    type: 'dam:Asset',
+    'p.limit': '100',
+    'p.hits': 'selective',
+    'p.properties': 'path',
+  });
+  const url = `/bin/querybuilder.json?${params.toString()}`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return [];
+    const json = await response.json();
+    const hits = Array.isArray(json?.hits) ? json.hits : [];
+    return hits
+      .map((hit) => hit?.path)
+      .filter((path) => typeof path === 'string' && path.startsWith('/content/dam/'));
+  } catch (e) {
+    return [];
+  }
+}
+
 function extractFolderChildren(folderJson) {
   if (Array.isArray(folderJson?.entities)) {
     return folderJson.entities
@@ -174,6 +196,7 @@ async function fetchNewsFromFolder(folderPath) {
   const folderJson = await fetchJsonFirst([
     ensureJsonPath(normalized),
     ensureJsonPath(`${normalized}/`),
+    `${normalized}.1.json`,
     ensureJsonPath(`/api/assets${normalized}`),
     ensureJsonPath(`/api/assets${normalized}/`),
     `${normalized}.2.json`,
@@ -190,8 +213,11 @@ async function fetchNewsFromFolder(folderPath) {
     .filter((path) => path !== normalized)
     .filter((path) => !path.endsWith('/jcr:content'));
 
+  const qbChildren = children.length ? [] : await fetchAssetsViaQueryBuilder(normalized);
+  const resolvedChildren = children.length ? children : qbChildren;
+
   const results = await Promise.allSettled(
-    children.map(async (path) => {
+    resolvedChildren.map(async (path) => {
       const cfJson = await fetchJsonFirst([
         ensureJsonPath(path),
         ensureJsonPath(`/api/assets${path}`),
@@ -210,7 +236,8 @@ async function fetchNewsFromFolder(folderPath) {
     items,
     debug: {
       normalized,
-      childrenCount: children.length,
+      childrenCount: resolvedChildren.length,
+      source: children.length ? 'folder-json' : 'querybuilder',
       rootKeys: Object.keys(folderJson || {}).slice(0, 8).join(','),
     },
   };
@@ -270,7 +297,7 @@ export default async function decorate(block) {
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement('p', 'news-listing-error');
-      info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount} | keys=${debug.rootKeys}`;
+      info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount} | source=${debug.source} | keys=${debug.rootKeys}`;
       list.append(info);
     }
   } catch (e) {

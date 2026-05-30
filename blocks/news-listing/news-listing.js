@@ -10,6 +10,11 @@ function getConfigValue(valueCell) {
   return (link?.getAttribute('title') || link?.textContent || valueCell.textContent || '').trim();
 }
 
+function isAuthorRuntime() {
+  const host = window?.location?.hostname || '';
+  return host.includes('author');
+}
+
 function ensureJsonPath(path) {
   const value = String(path || '').trim();
   if (!value) return '';
@@ -45,6 +50,8 @@ async function fetchAssetsViaQueryBuilder(folderPath) {
   const params = new URLSearchParams({
     path: folderPath,
     type: 'dam:Asset',
+    '1_property': 'jcr:content/contentFragment',
+    '1_property.value': 'true',
     'p.limit': '100',
     'p.hits': 'selective',
     'p.properties': 'path',
@@ -203,28 +210,7 @@ function renderNews(newsItems, config, container) {
 
 async function fetchNewsFromFolder(folderPath) {
   const normalized = normalizeFolderPath(folderPath);
-  const folderJson = await fetchJsonFirst([
-    ensureJsonPath(normalized),
-    ensureJsonPath(`${normalized}/`),
-    `${normalized}.1.json`,
-    ensureJsonPath(`/api/assets${normalized}`),
-    ensureJsonPath(`/api/assets${normalized}/`),
-    `${normalized}.2.json`,
-    `${normalized}.3.json`,
-  ]);
-
-  if (!folderJson) throw new Error('Folder not found or not readable');
-
-  const directChildren = extractFolderChildren(folderJson);
-  const deepChildren = Array.from(collectDamPathsRecursively(folderJson));
-  const children = [...new Set([...directChildren, ...deepChildren])]
-    .map((child) => resolveChildPath(normalized, child))
-    .filter(Boolean)
-    .filter((path) => path !== normalized)
-    .filter((path) => !path.endsWith('/jcr:content'));
-
-  const qbChildren = children.length ? [] : await fetchAssetsViaQueryBuilder(normalized);
-  const resolvedChildren = children.length ? children : qbChildren;
+  const resolvedChildren = await fetchAssetsViaQueryBuilder(normalized);
 
   const results = await Promise.allSettled(
     resolvedChildren.map(async (path) => {
@@ -247,8 +233,8 @@ async function fetchNewsFromFolder(folderPath) {
     debug: {
       normalized,
       childrenCount: resolvedChildren.length,
-      source: children.length ? 'folder-json' : 'querybuilder',
-      rootKeys: Object.keys(folderJson || {}).slice(0, 8).join(','),
+      source: 'querybuilder-author',
+      rootKeys: '',
     },
   };
 }
@@ -306,6 +292,10 @@ export default async function decorate(block) {
   }
 
   try {
+    if (!isAuthorRuntime()) {
+      list.innerHTML = '<p class="news-listing-error">Este bloco de demo está configurado para funcionar no Author.</p>';
+      return;
+    }
     let items = [];
     let debug = { normalized: normalizeFolderPath(contentFragmentFolder), childrenCount: 0, source: 'manual', rootKeys: '' };
     const manualPaths = parseManualPaths(manualNewsPaths);

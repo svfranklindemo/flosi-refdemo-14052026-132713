@@ -48,6 +48,24 @@ async function fetchJsonFirst(urls) {
   return null;
 }
 
+async function fetchJsonWithStatus(urls) {
+  for (let i = 0; i < urls.length; i += 1) {
+    const url = urls[i];
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        // try next
+        continue;
+      }
+      const json = await response.json();
+      return { json, url, status: response.status };
+    } catch (e) {
+      // try next
+    }
+  }
+  return { json: null, url: urls[0] || '', status: 'not-found' };
+}
+
 async function fetchAssetsViaQueryBuilder(folderPath) {
   const params = new URLSearchParams({
     path: folderPath,
@@ -284,16 +302,18 @@ async function fetchNewsFromFolder(folderPath) {
   const qbResult = await fetchAssetsViaQueryBuilder(normalized);
   const resolvedChildren = qbResult.paths;
 
+  const cfDebug = [];
   const results = await Promise.allSettled(
     resolvedChildren.map(async (path) => {
-      const cfJson = await fetchJsonFirst([
+      const cf = await fetchJsonWithStatus([
         ensureJsonPath(path),
         ensureJsonPath(`/api/assets${path}`),
         `${normalizeFolderPath(path)}/jcr:content/data/master.json`,
         `${normalizeFolderPath(path)}/_jcr_content/data/master.json`,
       ]);
-      if (!cfJson) return null;
-      return extractNewsFromCfJson(cfJson);
+      cfDebug.push(`${path}=>${cf.status}`);
+      if (!cf.json) return null;
+      return extractNewsFromCfJson(cf.json);
     }),
   );
 
@@ -311,6 +331,7 @@ async function fetchNewsFromFolder(folderPath) {
       qbStatus: qbResult.debug.qbStatus,
       qbTotal: qbResult.debug.qbTotal,
       qbSample: qbResult.debug.qbSample,
+      cfFetch: cfDebug.slice(0, 4).join(' | '),
     },
   };
 }
@@ -398,7 +419,7 @@ export default async function decorate(block) {
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement('p', 'news-listing-error');
-      info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount} | source=${debug.source} | qbStatus=${debug.qbStatus} | qbTotal=${debug.qbTotal} | qbSample=${debug.qbSample} | qbUrl=${debug.qbUrl}`;
+      info.textContent = `Debug: folder=${debug.normalized} | children=${debug.childrenCount} | source=${debug.source} | qbStatus=${debug.qbStatus} | qbTotal=${debug.qbTotal} | qbSample=${debug.qbSample} | cfFetch=${debug.cfFetch} | qbUrl=${debug.qbUrl}`;
       info.textContent += ` | debugVersion=${DEBUG_VERSION}`;
       list.append(info);
     }

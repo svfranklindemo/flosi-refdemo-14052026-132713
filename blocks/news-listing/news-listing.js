@@ -130,6 +130,14 @@ function readFieldValue(field) {
   return '';
 }
 
+function parseManualPaths(raw) {
+  if (!raw) return [];
+  return raw
+    .split(/\r?\n|,/g)
+    .map((item) => item.trim())
+    .filter((item) => item.startsWith('/content/dam/'));
+}
+
 function extractNewsFromCfJson(cfJson) {
   const master = cfJson?.['jcr:content']?.data?.master || cfJson?.data?.master || {};
   const elements = cfJson?.elements || {};
@@ -253,6 +261,7 @@ export default async function decorate(block) {
   let ctaLabel = 'Ver detalhes';
   let detailBasePath = '/news';
   let emptyStateText = 'Nenhuma notícia encontrada.';
+  let manualNewsPaths = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -274,6 +283,8 @@ export default async function decorate(block) {
       case 'detailbasepath': detailBasePath = value; break;
       case 'empty state text':
       case 'emptystatetext': emptyStateText = value; break;
+      case 'manual news paths':
+      case 'manualnewspaths': manualNewsPaths = value; break;
       default: break;
     }
   });
@@ -295,7 +306,29 @@ export default async function decorate(block) {
   }
 
   try {
-    const { items, debug } = await fetchNewsFromFolder(contentFragmentFolder);
+    let items = [];
+    let debug = { normalized: normalizeFolderPath(contentFragmentFolder), childrenCount: 0, source: 'manual', rootKeys: '' };
+    const manualPaths = parseManualPaths(manualNewsPaths);
+    if (manualPaths.length) {
+      const results = await Promise.allSettled(
+        manualPaths.map(async (path) => {
+          const cfJson = await fetchJsonFirst([
+            ensureJsonPath(path),
+            ensureJsonPath(`/api/assets${path}`),
+            `${normalizeFolderPath(path)}/jcr:content/data/master.json`,
+            `${normalizeFolderPath(path)}/_jcr_content/data/master.json`,
+          ]);
+          if (!cfJson) return null;
+          return extractNewsFromCfJson(cfJson);
+        }),
+      );
+      items = results
+        .filter((result) => result.status === 'fulfilled' && result.value)
+        .map((result) => result.value);
+      debug = { ...debug, childrenCount: manualPaths.length, source: 'manual-paths' };
+    } else {
+      ({ items, debug } = await fetchNewsFromFolder(contentFragmentFolder));
+    }
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement('p', 'news-listing-error');

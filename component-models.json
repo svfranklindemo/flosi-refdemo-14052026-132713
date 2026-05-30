@@ -5801,6 +5801,13 @@
         "name": "emptyStateText",
         "label": "Empty State Text",
         "value": "Nenhuma notícia encontrada."
+      },
+      {
+        "component": "textarea",
+        "valueType": "string",
+        "name": "manualNewsPaths",
+        "label": "Manual News Paths (one per line, optional)",
+        "value": ""
       }
     ]
   },

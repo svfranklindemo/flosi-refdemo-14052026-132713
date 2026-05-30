@@ -181,7 +181,15 @@ function readFieldValue(field) {
   if (field === null || field === undefined) return '';
   if (typeof field === 'string') return field;
   if (typeof field === 'number') return String(field);
-  if (typeof field === 'object') return field.plaintext || field.value || field._path || '';
+  if (typeof field === 'object') {
+    return field.plaintext
+      || field.html
+      || field.value
+      || field._path
+      || field.path
+      || field.name
+      || '';
+  }
   return '';
 }
 
@@ -194,16 +202,31 @@ function parseManualPaths(raw) {
 }
 
 function extractNewsFromCfJson(cfJson) {
-  const master = cfJson?.['jcr:content']?.data?.master || cfJson?.data?.master || {};
-  const elements = cfJson?.elements || {};
+  const master = cfJson?.['jcr:content']?.data?.master
+    || cfJson?.data?.master
+    || cfJson?.properties?.data?.master
+    || {};
+  const elements = cfJson?.elements || cfJson?.properties?.elements || {};
+  const properties = cfJson?.properties || {};
+  const path = cfJson?.[':path']
+    || cfJson?._path
+    || properties?.path
+    || master?.path
+    || '';
+  const fallbackTitle = path ? path.split('/').filter(Boolean).pop() : 'News';
 
-  const title = master.title || readFieldValue(elements.title);
-  if (!title) return null;
+  const title = master.title
+    || readFieldValue(elements.title)
+    || cfJson?.title
+    || properties?.title
+    || properties?.['jcr:title']
+    || fallbackTitle;
 
   const description = master.description
     || readFieldValue(elements.description)
     || master.shortDescription
     || readFieldValue(elements.shortDescription)
+    || properties?.description
     || '';
 
   const category = master.category || readFieldValue(elements.category) || '';
@@ -212,7 +235,7 @@ function extractNewsFromCfJson(cfJson) {
   const image = mediaPath || '';
 
   return {
-    id: cfJson?.[':path'] || cfJson?._path || title,
+    id: path || title,
     title,
     description: typeof description === 'string' ? description : '',
     category: typeof category === 'string' ? category : '',

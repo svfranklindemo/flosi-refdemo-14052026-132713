@@ -53,8 +53,8 @@ async function fetchAssetsViaQueryBuilder(folderPath) {
     '1_property': 'jcr:content/contentFragment',
     '1_property.value': 'true',
     'p.limit': '100',
-    'p.hits': 'selective',
-    'p.properties': 'path',
+    'p.hits': 'full',
+    'p.properties': 'path jcr:path',
   });
   const url = `/bin/querybuilder.json?${params.toString()}`;
   try {
@@ -70,10 +70,25 @@ async function fetchAssetsViaQueryBuilder(folderPath) {
         },
       };
     }
+    const resolveHitPath = (hit) => {
+      if (!hit || typeof hit !== 'object') return '';
+      const direct = hit.path || hit['jcr:path'] || hit['@path'] || hit[':path'];
+      if (typeof direct === 'string' && direct.startsWith('/content/dam/')) return direct;
+      const values = Object.values(hit);
+      for (let i = 0; i < values.length; i += 1) {
+        const value = values[i];
+        if (typeof value === 'string' && value.startsWith('/content/dam/')) return value;
+        if (value && typeof value === 'object') {
+          const nested = resolveHitPath(value);
+          if (nested) return nested;
+        }
+      }
+      return '';
+    };
     const json = await response.json();
     const hits = Array.isArray(json?.hits) ? json.hits : [];
     const paths = hits
-      .map((hit) => hit?.path || hit?.['jcr:path'] || hit?.['@path'] || hit?.[':path'])
+      .map((hit) => resolveHitPath(hit))
       .map((path) => {
         if (typeof path !== 'string') return '';
         return path.replace(/\/jcr:content$/i, '');

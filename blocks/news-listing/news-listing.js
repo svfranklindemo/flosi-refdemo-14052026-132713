@@ -156,7 +156,13 @@ async function fetchNewsByFolder(folderPath, queryName, responseListKey) {
 
 function ensureJsonPath(path) {
   if (!path) return '';
-  return path.endsWith('.json') ? path : `${path}.json`;
+  const trimmed = String(path).trim();
+  if (/^https?:\/\//i.test(trimmed)) {
+    const url = new URL(trimmed);
+    const pathname = url.pathname.endsWith('.json') ? url.pathname : `${url.pathname}.json`;
+    return `${url.origin}${pathname}`;
+  }
+  return trimmed.endsWith('.json') ? trimmed : `${trimmed}.json`;
 }
 
 function readFieldValue(field) {
@@ -193,8 +199,15 @@ function extractCfCoreData(cfJson) {
 function getFolderChildren(folderJson) {
   if (Array.isArray(folderJson?.entities)) {
     return folderJson.entities
-      .map((entity) => entity?.properties?.path || entity?.path)
+      .map((entity) => entity?.properties?.path || entity?.path || entity?.properties?.['jcr:path'])
       .filter((path) => typeof path === 'string' && path.startsWith('/content/dam/'));
+  }
+
+  if (Array.isArray(folderJson?.children)) {
+    return folderJson.children
+      .map((child) => child?.path || child?.properties?.path || child?.name)
+      .map((path) => (path && path.startsWith('/content/dam/')) ? path : null)
+      .filter(Boolean);
   }
 
   return Object.keys(folderJson || {})
@@ -203,8 +216,38 @@ function getFolderChildren(folderJson) {
     .filter(Boolean);
 }
 
+function normalizeFolderPath(inputPath) {
+  if (!inputPath) return '';
+  const value = String(inputPath).trim();
+  if (/^https?:\/\//i.test(value)) {
+    try {
+      const parsed = new URL(value);
+      return parsed.pathname.replace(/\.json$/i, '');
+    } catch (e) {
+      return value.replace(/\.json$/i, '');
+    }
+  }
+  return value.replace(/\.json$/i, '');
+}
+
+async function fetchJsonFirst(urls) {
+  for (let i = 0; i < urls.length; i += 1) {
+    const url = urls[i];
+    try {
+      const response = await fetch(url);
+      if (!response.ok) continue;
+      const json = await response.json();
+      return json;
+    } catch (e) {
+      // keep trying next URL
+    }
+  }
+  return null;
+}
+
 async function fetchNewsFromDamFolder(folderPath) {
-  const folderResponse = await fetch(ensureJsonPath(folderPath));
+  const normalizedFolderPath = normalizeFolderPath(folderPath);
+  const folderResponse = await fetch(ensureJsonPath(normalizedFolderPath));
   if (!folderResponse.ok) {
     throw new Error(`Failed DAM folder request: ${folderResponse.status}`);
   }
@@ -215,9 +258,13 @@ async function fetchNewsFromDamFolder(folderPath) {
 
   const results = await Promise.allSettled(
     cfPaths.map(async (path) => {
-      const response = await fetch(ensureJsonPath(path));
-      if (!response.ok) return null;
-      const json = await response.json();
+      const normalizedPath = normalizeFolderPath(path);
+      const json = await fetchJsonFirst([
+        ensureJsonPath(normalizedPath),
+        `${normalizedPath}/jcr:content/data/master.json`,
+        `${normalizedPath}/_jcr_content/data/master.json`,
+      ]);
+      if (!json) return null;
       const core = extractCfCoreData(json);
       if (!core.title) return null;
       return normalizeCfData(core);
@@ -299,6 +346,7 @@ export default async function decorate(block) {
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('Error loading news listing:', e);
-    list.innerHTML = '<p class="news-listing-error">Erro ao carregar notícias.</p>';
+    const message = e?.message ? `Erro ao carregar notícias: ${e.message}` : 'Erro ao carregar notícias.';
+    list.innerHTML = `<p class="news-listing-error">${message}</p>`;
   }
 }

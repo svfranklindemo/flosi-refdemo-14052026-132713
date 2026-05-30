@@ -5801,20 +5801,6 @@
         "name": "emptyStateText",
         "label": "Empty State Text",
         "value": "Nenhuma notícia encontrada."
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "queryName",
-        "label": "Persisted Query Name",
-        "value": "GetNewsFromFolder"
-      },
-      {
-        "component": "text",
-        "valueType": "string",
-        "name": "responseListKey",
-        "label": "Response List Key (optional)",
-        "value": ""
       }
     ]
   },

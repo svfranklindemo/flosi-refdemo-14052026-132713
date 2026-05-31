@@ -74,7 +74,7 @@
           "value": "Nenhuma notícia encontrada."
         },
         {
-          "component": "textarea",
+          "component": "multiline",
           "valueType": "string",
           "name": "manualNewsPaths",
           "label": "Manual News Paths (one per line, optional)",

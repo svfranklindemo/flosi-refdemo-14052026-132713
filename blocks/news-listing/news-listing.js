@@ -5,7 +5,7 @@ function createElement(tag, className, html) {
   return element;
 }
 
-const DEBUG_VERSION = 'news-listing-v4';
+const DEBUG_VERSION = 'news-listing-v5';
 
 function getConfigValue(valueCell) {
   const link = valueCell.querySelector('a');
@@ -411,7 +411,7 @@ export default async function decorate(block) {
 
   const header = createElement('div', 'news-listing-header', `
     <h2 class="news-listing-title">${title}</h2>
-    <p class="news-listing-subtitle">${subtitle}</p>
+    <p class="news-listing-subtitle">${subtitle}${isAuthorRuntime() ? ` (${DEBUG_VERSION})` : ''}</p>
   `);
   const list = createElement('div', 'news-listing-results');
   list.innerHTML = '<p class="news-listing-loading">Carregando notícias...</p>';

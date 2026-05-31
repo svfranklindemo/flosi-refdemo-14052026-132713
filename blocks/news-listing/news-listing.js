@@ -233,19 +233,30 @@ function extractNewsFromCfJson(cfJson) {
     || '';
   const fallbackTitle = path ? path.split('/').filter(Boolean).pop() : 'News';
 
+  const metadataTitle = (properties?.stringMetadata || [])
+    .find((item) => item?.name === 'title')?.value || '';
   const title = master.title
     || readFieldValue(elements.title)
     || cfJson?.title
     || properties?.title
     || properties?.['jcr:title']
+    || metadataTitle
     || fallbackTitle;
 
+  const metadataDescription = (properties?.stringMetadata || [])
+    .find((item) => item?.name === 'description')?.value || '';
   const description = master.description
     || readFieldValue(elements.description)
     || master.shortDescription
     || readFieldValue(elements.shortDescription)
     || properties?.description
+    || metadataDescription
     || '';
+
+  const normalizedTitle = String(title || '').trim();
+  const finalTitle = normalizedTitle.toLowerCase() === 'news' && metadataTitle
+    ? metadataTitle
+    : normalizedTitle;
 
   const category = master.category || readFieldValue(elements.category) || '';
   const slug = master.slug || readFieldValue(elements.slug) || '';
@@ -254,7 +265,7 @@ function extractNewsFromCfJson(cfJson) {
 
   return {
     id: path || title,
-    title,
+    title: finalTitle || fallbackTitle,
     description: typeof description === 'string' ? description : '',
     category: typeof category === 'string' ? category : '',
     slug: typeof slug === 'string' ? slug : '',

@@ -6,6 +6,7 @@ function createElement(tag, className, html) {
 }
 
 const DEBUG_VERSION = 'news-listing-v3';
+const NEWS_BY_PATH_QUERY = 'newsByPath';
 
 function getConfigValue(valueCell) {
   const link = valueCell.querySelector('a');
@@ -273,6 +274,46 @@ function extractNewsFromCfJson(cfJson) {
   };
 }
 
+function extractNewsFromGraphQlPayload(payload) {
+  const data = payload?.data || {};
+  const candidate = Object.values(data).find((entry) => entry?.item)?.item
+    || data?.newsByPath?.item
+    || null;
+  if (!candidate) return null;
+
+  const title = candidate?.title || '';
+  const description = candidate?.description?.plaintext
+    || candidate?.description?.html
+    || '';
+  const image = candidate?.media?._authorUrl
+    || candidate?.media?._publishUrl
+    || candidate?.media?._dynamicUrl
+    || '';
+  const category = Array.isArray(candidate?.category) ? candidate.category[0] : (candidate?.category || '');
+  const slug = candidate?.slug || '';
+
+  return {
+    id: candidate?._path || title || 'news-item',
+    title: title || 'News',
+    description,
+    category,
+    slug,
+    image,
+  };
+}
+
+async function fetchNewsByPathGraphQl(path) {
+  const url = `/graphql/execute.json/ref-demo-eds/${NEWS_BY_PATH_QUERY};path=${encodeURIComponent(path)};ts=${Date.now()}`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const json = await response.json();
+    return extractNewsFromGraphQlPayload(json);
+  } catch (e) {
+    return null;
+  }
+}
+
 function resolveNewsLink(slug, detailBasePath) {
   if (!slug) return '#';
   if (/^https?:\/\//i.test(slug)) return slug;
@@ -316,6 +357,11 @@ async function fetchNewsFromFolder(folderPath) {
   const cfDebug = [];
   const results = await Promise.allSettled(
     resolvedChildren.map(async (path) => {
+      const gqlItem = await fetchNewsByPathGraphQl(path);
+      if (gqlItem) {
+        cfDebug.push(`${path}=>gql`);
+        return gqlItem;
+      }
       const cf = await fetchJsonWithStatus([
         ensureJsonPath(path),
         ensureJsonPath(`/api/assets${path}`),

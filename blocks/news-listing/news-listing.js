@@ -211,6 +211,23 @@ function readFieldValue(field) {
   return '';
 }
 
+function readElement(elements, key) {
+  const value = elements?.[key];
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object') {
+    return value.value
+      || value.plaintext
+      || value.html
+      || value.path
+      || value._path
+      || value['repo:path']
+      || value['xdm:linkURL']
+      || '';
+  }
+  return '';
+}
+
 function parseManualPaths(raw) {
   if (!raw) return [];
   return raw
@@ -224,7 +241,7 @@ function extractNewsFromCfJson(cfJson) {
     || cfJson?.data?.master
     || cfJson?.properties?.data?.master
     || {};
-  const elements = cfJson?.elements || cfJson?.properties?.elements || {};
+  const elements = cfJson?.properties?.elements || cfJson?.elements || {};
   const properties = cfJson?.properties || {};
   const path = cfJson?.[':path']
     || cfJson?._path
@@ -233,9 +250,11 @@ function extractNewsFromCfJson(cfJson) {
     || '';
   const fallbackTitle = path ? path.split('/').filter(Boolean).pop() : 'News';
 
+  const elementTitle = readElement(elements, 'title');
   const metadataTitle = (properties?.stringMetadata || [])
     .find((item) => item?.name === 'title')?.value || '';
   const title = master.title
+    || elementTitle
     || readFieldValue(elements.title)
     || cfJson?.title
     || properties?.title
@@ -243,11 +262,15 @@ function extractNewsFromCfJson(cfJson) {
     || metadataTitle
     || fallbackTitle;
 
+  const elementDescription = readElement(elements, 'description');
+  const elementShortDescription = readElement(elements, 'shortDescription');
   const metadataDescription = (properties?.stringMetadata || [])
     .find((item) => item?.name === 'description')?.value || '';
   const description = master.description
+    || elementDescription
     || readFieldValue(elements.description)
     || master.shortDescription
+    || elementShortDescription
     || readFieldValue(elements.shortDescription)
     || properties?.description
     || metadataDescription
@@ -258,9 +281,9 @@ function extractNewsFromCfJson(cfJson) {
     ? metadataTitle
     : normalizedTitle;
 
-  const category = master.category || readFieldValue(elements.category) || '';
-  const slug = master.slug || readFieldValue(elements.slug) || '';
-  const mediaPath = master.media || readFieldValue(elements.media) || '';
+  const category = master.category || readElement(elements, 'category') || readFieldValue(elements.category) || '';
+  const slug = master.slug || readElement(elements, 'slug') || readFieldValue(elements.slug) || '';
+  const mediaPath = master.media || readElement(elements, 'media') || readFieldValue(elements.media) || '';
   const image = mediaPath || '';
 
   return {

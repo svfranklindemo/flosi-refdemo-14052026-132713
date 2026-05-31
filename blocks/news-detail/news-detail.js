@@ -14,6 +14,14 @@ function normalizePath(path) {
   return String(path || '').trim().replace(/\/+$/g, '');
 }
 
+function parseManualPaths(raw) {
+  if (!raw) return [];
+  return raw
+    .split(/\r?\n|,/g)
+    .map((item) => item.trim())
+    .filter((item) => item.startsWith('/content/dam/'));
+}
+
 function readValue(field) {
   if (field === null || field === undefined) return '';
   if (typeof field === 'string') return field;
@@ -91,6 +99,7 @@ export default async function decorate(block) {
   let detailBasePath = '/news';
   let notFoundText = 'Notícia não encontrada.';
   let missingSlugText = 'Slug da notícia não encontrado na URL.';
+  let manualNewsPaths = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -107,6 +116,8 @@ export default async function decorate(block) {
       case 'notfoundtext': notFoundText = value; break;
       case 'missing slug text':
       case 'missingslugtext': missingSlugText = value; break;
+      case 'manual news paths':
+      case 'manualnewspaths': manualNewsPaths = value; break;
       default: break;
     }
   });
@@ -125,7 +136,11 @@ export default async function decorate(block) {
     return;
   }
 
-  const paths = await fetchAssetsViaQueryBuilder(normalizePath(contentFragmentFolder));
+  const manualPaths = parseManualPaths(manualNewsPaths);
+  const paths = manualPaths.length
+    ? manualPaths
+    : await fetchAssetsViaQueryBuilder(normalizePath(contentFragmentFolder));
+
   const masters = await Promise.all(paths.map((path) => fetchMaster(path)));
   const items = masters
     .map((master, index) => normalizeNews(master, paths[index]))

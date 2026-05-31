@@ -51,6 +51,13 @@
           "name": "missingSlugText",
           "label": "Missing Slug Text",
           "value": "Slug da notícia não encontrado na URL."
+        },
+        {
+          "component": "multiline",
+          "valueType": "string",
+          "name": "manualNewsPaths",
+          "label": "Manual News Paths (one per line, optional)",
+          "value": ""
         }
       ]
     }

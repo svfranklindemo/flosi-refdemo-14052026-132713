@@ -109,15 +109,25 @@ function resolveNewsLink(slug, detailBasePath) {
   if (!slug) return '#';
   if (/^https?:\/\//i.test(slug)) return slug;
   if (slug.startsWith('/')) return slug;
+  const cleanSlug = slug.replace(/^\//, '');
   if (isAuthorRuntime()) {
     const current = window.location.pathname;
     const pagePath = current.replace(/\/+$/, '');
     const parent = pagePath.substring(0, pagePath.lastIndexOf('/') + 1);
     const detailName = (detailBasePath || '/news').replace(/^\/+/, '').split('/')[0] || 'news';
-    return `${parent}${detailName}.html?slug=${encodeURIComponent(slug)}`;
+    return `${parent}${detailName}.html?slug=${encodeURIComponent(cleanSlug)}`;
   }
-  const base = (detailBasePath || '/news').replace(/\/$/, '');
-  return `${base}/${slug.replace(/^\//, '')}`;
+  const current = window.location.pathname.replace(/\/+$/, '');
+  const parent = current.substring(0, current.lastIndexOf('/')) || '';
+  const rawBase = (detailBasePath || '/news').trim();
+  const baseSegments = rawBase.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+  let finalBase = rawBase.replace(/\/+$/g, '');
+  if (rawBase.startsWith('/') && baseSegments.length === 1) {
+    finalBase = `${parent}/${baseSegments[0]}`;
+  } else if (!rawBase.startsWith('/')) {
+    finalBase = `${parent}/${rawBase.replace(/^\/+|\/+$/g, '')}`;
+  }
+  return `${finalBase}/${cleanSlug}`;
 }
 
 function renderNews(items, config, container) {

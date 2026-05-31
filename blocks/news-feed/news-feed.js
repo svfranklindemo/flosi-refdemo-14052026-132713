@@ -114,7 +114,8 @@ function resolveNewsLink(slug, detailBasePath) {
     const current = window.location.pathname;
     const pagePath = current.replace(/\/+$/, '');
     const parent = pagePath.substring(0, pagePath.lastIndexOf('/') + 1);
-    const detailName = (detailBasePath || '/news').replace(/^\/+/, '').split('/')[0] || 'news';
+    const detailSegments = (detailBasePath || '/news').replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+    const detailName = detailSegments[detailSegments.length - 1] || 'news';
     return `${parent}${detailName}.html?slug=${encodeURIComponent(cleanSlug)}`;
   }
   const current = window.location.pathname.replace(/\/+$/, '');

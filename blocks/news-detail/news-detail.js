@@ -23,6 +23,8 @@ function readValue(field) {
 }
 
 function getSlugFromPath(detailBasePath) {
+  const fromQuery = new URLSearchParams(window.location.search).get('slug');
+  if (fromQuery) return decodeURIComponent(fromQuery.trim());
   const base = normalizePath(detailBasePath || '/news');
   const current = normalizePath(window.location.pathname);
   if (!current.startsWith(base)) return '';

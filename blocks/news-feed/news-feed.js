@@ -24,6 +24,14 @@ function normalizeFolderPath(path) {
     .replace(/\/+$/g, '');
 }
 
+function parseManualPaths(raw) {
+  if (!raw) return [];
+  return raw
+    .split(/\r?\n|,/g)
+    .map((item) => item.trim())
+    .filter((item) => item.startsWith('/content/dam/'));
+}
+
 function readFieldValue(field) {
   if (field === null || field === undefined) return '';
   if (typeof field === 'string') return field;
@@ -101,6 +109,13 @@ function resolveNewsLink(slug, detailBasePath) {
   if (!slug) return '#';
   if (/^https?:\/\//i.test(slug)) return slug;
   if (slug.startsWith('/')) return slug;
+  if (isAuthorRuntime()) {
+    const current = window.location.pathname;
+    const pagePath = current.replace(/\/+$/, '');
+    const parent = pagePath.substring(0, pagePath.lastIndexOf('/') + 1);
+    const detailName = (detailBasePath || '/news').replace(/^\/+/, '').split('/')[0] || 'news';
+    return `${parent}${detailName}.html?slug=${encodeURIComponent(slug)}`;
+  }
   const base = (detailBasePath || '/news').replace(/\/$/, '');
   return `${base}/${slug.replace(/^\//, '')}`;
 }
@@ -130,13 +145,10 @@ function renderNews(items, config, container) {
   });
 }
 
-async function fetchNewsFromFolder(folderPath) {
-  const normalized = normalizeFolderPath(folderPath);
-  const qb = await fetchAssetsViaQueryBuilder(normalized);
+async function fetchNewsFromPaths(paths) {
   const cfFetchDebug = [];
-
   const results = await Promise.allSettled(
-    qb.paths.map(async (path) => {
+    paths.map(async (path) => {
       const masterUrl = `${normalizeFolderPath(path)}/jcr:content/data/master.json`;
       const cf = await fetchJsonWithStatus([masterUrl]);
       cfFetchDebug.push(`${path}=>${cf.status}`);
@@ -148,6 +160,14 @@ async function fetchNewsFromFolder(folderPath) {
   const items = results
     .filter((result) => result.status === 'fulfilled' && result.value)
     .map((result) => result.value);
+
+  return { items, cfFetchDebug };
+}
+
+async function fetchNewsFromFolder(folderPath) {
+  const normalized = normalizeFolderPath(folderPath);
+  const qb = await fetchAssetsViaQueryBuilder(normalized);
+  const { items, cfFetchDebug } = await fetchNewsFromPaths(qb.paths);
 
   return {
     items,
@@ -171,6 +191,7 @@ export default async function decorate(block) {
   let ctaLabel = 'Ver detalhes';
   let detailBasePath = '/news';
   let emptyStateText = 'Nenhuma notícia encontrada.';
+  let manualNewsPaths = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -192,6 +213,8 @@ export default async function decorate(block) {
       case 'detailbasepath': detailBasePath = value; break;
       case 'empty state text':
       case 'emptystatetext': emptyStateText = value; break;
+      case 'manual news paths':
+      case 'manualnewspaths': manualNewsPaths = value; break;
       default: break;
     }
   });
@@ -212,13 +235,25 @@ export default async function decorate(block) {
     return;
   }
 
-  if (!isAuthorRuntime()) {
-    list.innerHTML = '<p class="news-feed-error">Bloco de demo disponível somente no Author.</p>';
-    return;
-  }
-
   try {
-    const { items, debug } = await fetchNewsFromFolder(contentFragmentFolder);
+    const manualPaths = parseManualPaths(manualNewsPaths);
+    let items = [];
+    let debug = null;
+    if (manualPaths.length) {
+      const result = await fetchNewsFromPaths(manualPaths);
+      items = result.items;
+      debug = {
+        folder: normalizeFolderPath(contentFragmentFolder),
+        children: manualPaths.length,
+        qbStatus: 'manual',
+        qbTotal: manualPaths.length,
+        qbSample: manualPaths.slice(0, 3).join(','),
+        qbUrl: 'manual',
+        cfFetch: result.cfFetchDebug.slice(0, 4).join(' | '),
+      };
+    } else {
+      ({ items, debug } = await fetchNewsFromFolder(contentFragmentFolder));
+    }
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement(

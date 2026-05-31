@@ -17,6 +17,10 @@ function getConfigValue(valueCell) {
   return (link?.getAttribute('title') || link?.textContent || valueCell.textContent || '').trim();
 }
 
+function normalizeConfigKey(raw) {
+  return String(raw || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 function normalizeFolderPath(path) {
   return String(path || '')
     .trim()
@@ -207,25 +211,23 @@ export default async function decorate(block) {
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
     if (cells.length < 2) return;
-    const key = cells[0].textContent?.trim()?.toLowerCase();
+    const key = normalizeConfigKey(cells[0].textContent);
     const value = getConfigValue(cells[1]);
     if (!key || !value) return;
 
     switch (key) {
       case 'title': title = value; break;
       case 'subtitle': subtitle = value; break;
-      case 'content fragment folder':
       case 'contentfragmentfolder': contentFragmentFolder = value; break;
-      case 'max items':
       case 'maxitems': maxItems = Number.parseInt(value, 10) || 6; break;
-      case 'cta label':
       case 'ctalabel': ctaLabel = value; break;
-      case 'detail base path':
       case 'detailbasepath': detailBasePath = value; break;
-      case 'empty state text':
       case 'emptystatetext': emptyStateText = value; break;
-      case 'manual news paths':
-      case 'manualnewspaths': manualNewsPaths = value; break;
+      case 'manualnewspaths':
+      case 'manualnewspathsoneperlineoptional':
+      case 'manualnewspathscommaseparatedoptional':
+        manualNewsPaths = value;
+        break;
       default: break;
     }
   });

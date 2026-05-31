@@ -10,6 +10,10 @@ function getConfigValue(valueCell) {
   return (link?.getAttribute('title') || link?.textContent || valueCell.textContent || '').trim();
 }
 
+function normalizeConfigKey(raw) {
+  return String(raw || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 function normalizePath(path) {
   return String(path || '').trim().replace(/\/+$/g, '');
 }
@@ -104,20 +108,19 @@ export default async function decorate(block) {
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
     if (cells.length < 2) return;
-    const key = cells[0].textContent?.trim()?.toLowerCase();
+    const key = normalizeConfigKey(cells[0].textContent);
     const value = getConfigValue(cells[1]);
     if (!key || !value) return;
     switch (key) {
-      case 'content fragment folder':
       case 'contentfragmentfolder': contentFragmentFolder = value; break;
-      case 'detail base path':
       case 'detailbasepath': detailBasePath = value; break;
-      case 'not found text':
       case 'notfoundtext': notFoundText = value; break;
-      case 'missing slug text':
       case 'missingslugtext': missingSlugText = value; break;
-      case 'manual news paths':
-      case 'manualnewspaths': manualNewsPaths = value; break;
+      case 'manualnewspaths':
+      case 'manualnewspathsoneperlineoptional':
+      case 'manualnewspathscommaseparatedoptional':
+        manualNewsPaths = value;
+        break;
       default: break;
     }
   });

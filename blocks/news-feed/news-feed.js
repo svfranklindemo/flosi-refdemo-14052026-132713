@@ -237,14 +237,18 @@ function parseManualPaths(raw) {
 }
 
 function extractNewsFromCfJson(cfJson) {
-  const master = cfJson?.['jcr:content']?.data?.master
-    || cfJson?.data?.master
-    || cfJson?.properties?.data?.master
+  const root = Array.isArray(cfJson?.entities) && cfJson.entities.length
+    ? (cfJson.entities[0] || cfJson)
+    : cfJson;
+
+  const master = root?.['jcr:content']?.data?.master
+    || root?.data?.master
+    || root?.properties?.data?.master
     || {};
-  const elements = cfJson?.properties?.elements || cfJson?.elements || {};
-  const properties = cfJson?.properties || {};
-  const path = cfJson?.[':path']
-    || cfJson?._path
+  const elements = root?.properties?.elements || root?.elements || {};
+  const properties = root?.properties || {};
+  const path = root?.[':path']
+    || root?._path
     || properties?.path
     || master?.path
     || '';
@@ -256,7 +260,7 @@ function extractNewsFromCfJson(cfJson) {
   const title = master.title
     || elementTitle
     || readFieldValue(elements.title)
-    || cfJson?.title
+    || root?.title
     || properties?.title
     || properties?.['jcr:title']
     || metadataTitle

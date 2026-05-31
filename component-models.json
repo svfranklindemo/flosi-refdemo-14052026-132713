@@ -5748,6 +5748,42 @@
     ]
   },
   {
+    "id": "news-detail",
+    "fields": [
+      {
+        "component": "aem-content",
+        "name": "contentFragmentFolder",
+        "label": "Content Fragment Folder",
+        "description": "Folder where news content fragments are stored",
+        "valueType": "string",
+        "validation": {
+          "rootPath": "/content/dam"
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "detailBasePath",
+        "label": "Detail Base Path",
+        "value": "/news"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "notFoundText",
+        "label": "Not Found Text",
+        "value": "Notícia não encontrada."
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "missingSlugText",
+        "label": "Missing Slug Text",
+        "value": "Slug da notícia não encontrado na URL."
+      }
+    ]
+  },
+  {
     "id": "news-feed",
     "fields": [
       {

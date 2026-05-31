@@ -1,4 +1,4 @@
-const DEBUG_VERSION = 'news-feed-clean-v1';
+const DEBUG_VERSION = 'news-feed-clean-v2';
 
 function createElement(tag, className, html) {
   const element = document.createElement(tag);
@@ -261,16 +261,20 @@ export default async function decorate(block) {
         qbSample: manualPaths.slice(0, 3).join(','),
         qbUrl: 'manual',
         cfFetch: result.cfFetchDebug.slice(0, 4).join(' | '),
+        manualCount: manualPaths.length,
+        manualSample: manualPaths.slice(0, 3).join(','),
       };
     } else {
       ({ items, debug } = await fetchNewsFromFolder(contentFragmentFolder));
+      debug.manualCount = 0;
+      debug.manualSample = '';
     }
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement(
         'p',
         'news-feed-error',
-        `Debug: folder=${debug.folder} | children=${debug.children} | qbStatus=${debug.qbStatus} | qbTotal=${debug.qbTotal} | qbSample=${debug.qbSample} | cfFetch=${debug.cfFetch} | qbUrl=${debug.qbUrl} | debugVersion=${DEBUG_VERSION}`,
+        `Debug: folder=${debug.folder} | children=${debug.children} | qbStatus=${debug.qbStatus} | qbTotal=${debug.qbTotal} | qbSample=${debug.qbSample} | manualCount=${debug.manualCount} | manualSample=${debug.manualSample} | cfFetch=${debug.cfFetch} | qbUrl=${debug.qbUrl} | debugVersion=${DEBUG_VERSION}`,
       );
       list.append(info);
     }

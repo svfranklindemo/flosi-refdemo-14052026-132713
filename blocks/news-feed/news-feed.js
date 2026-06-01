@@ -40,9 +40,9 @@ function buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath) {
   const base = String(graphqlEndpoint || '').trim().replace(/\/+$/g, '');
   if (!base) return '';
   if (base.includes('/graphql/execute.json')) {
-    return `${base}/${persisted};path=${encodeURIComponent(folder)}`;
+    return `${base}/${persisted};path=${folder}`;
   }
-  return `${base}/graphql/execute.json/${persisted};path=${encodeURIComponent(folder)}`;
+  return `${base}/graphql/execute.json/${persisted};path=${folder}`;
 }
 
 function resolveGraphqlEndpoint(authorGraphqlEndpoint, edgeGraphqlEndpoint) {

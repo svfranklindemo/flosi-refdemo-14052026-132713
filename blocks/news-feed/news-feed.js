@@ -81,7 +81,7 @@ function extractNewsFromGraphql(item) {
     id: item._path || item._id || title,
     title,
     description: readFieldValue(item.description) || '',
-    category: readFieldValue(item.category) || '',
+    category: readFieldValue(item.category) || 'Nacional',
     slug: String(item.slug || '').trim(),
     image: readFieldValue(item.media) || '',
     createdAt: String(item.createdAt || item.publishedAt || item.updatedAt || item._createdAt || '').trim(),
@@ -89,19 +89,17 @@ function extractNewsFromGraphql(item) {
 }
 
 function sortNewsNewestFirst(items) {
+  // Sort by date when available; otherwise keep AEM order (already newest-first)
   const hasDates = items.some((n) => n.createdAt);
-  if (hasDates) {
-    return [...items].sort((a, b) => {
-      const aTime = Date.parse(a.createdAt || '') || 0;
-      const bTime = Date.parse(b.createdAt || '') || 0;
-      if (!aTime && !bTime) return 0;
-      if (!aTime) return 1;
-      if (!bTime) return -1;
-      return bTime - aTime;
-    });
-  }
-  // No dates: AEM returns oldest-first, so reverse for newest-first
-  return [...items].reverse();
+  if (!hasDates) return items;
+  return [...items].sort((a, b) => {
+    const aTime = Date.parse(a.createdAt || '') || 0;
+    const bTime = Date.parse(b.createdAt || '') || 0;
+    if (!aTime && !bTime) return 0;
+    if (!aTime) return 1;
+    if (!bTime) return -1;
+    return bTime - aTime;
+  });
 }
 
 function resolveNewsLink(slug, detailBasePath) {

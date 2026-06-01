@@ -48,7 +48,7 @@ function extractNewsItem(item) {
     path: item._path || item._id || '',
     title,
     description: readFieldValue(item.description) || '',
-    category: readFieldValue(item.category) || '',
+    category: readFieldValue(item.category) || 'Nacional',
     slug: String(item.slug || '').trim(),
     image: readFieldValue(item.media) || '',
     createdAt: String(item.createdAt || item.publishedAt || item.updatedAt || item._createdAt || '').trim(),

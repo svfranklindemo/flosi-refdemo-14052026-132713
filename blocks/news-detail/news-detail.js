@@ -133,7 +133,7 @@ function normalizeNewsFromGraphql(item) {
     title,
     description: readValue(item.description) || '',
     content: readValue(item.content) || '',
-    category: readValue(item.category) || '',
+    category: readValue(item.category) || 'Nacional',
     slug: String(item.slug || '').trim(),
     image: readValue(item.media) || '',
     createdAt: readValue(item.createdAt) || '',

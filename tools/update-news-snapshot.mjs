@@ -5,20 +5,31 @@ const endpoint = process.env.NEWS_GRAPHQL_URL
 const output = process.env.NEWS_OUTPUT_PATH || './news-data.json';
 
 function parseCreatedAt(master) {
+  // Primary: calendarMetadata (author env)
   const calendars = Array.isArray(master?._metadata?.calendarMetadata)
     ? master._metadata.calendarMetadata
     : [];
-  const createdAt = calendars.find((entry) => entry?.name === 'jcr:created')?.value || '';
-  const updatedAt = calendars.find((entry) => entry?.name === 'cq:lastModified')?.value || '';
-  const publishedAt = calendars.find((entry) => entry?.name === 'cq:lastPublished')?.value || '';
-  const createdBy = calendars.find((entry) => entry?.name === 'jcr:createdBy')?.value || '';
-  const updatedBy = calendars.find((entry) => entry?.name === 'cq:lastModifiedBy')?.value || '';
+  const fromCal = (name) => calendars.find((e) => e?.name === name)?.value || '';
+
+  // Fallback: @LastModified fields present in publish master.json
+  // Use the most recent field's date as the "content updated" date
+  const lastModFields = Object.entries(master || {})
+    .filter(([k]) => k.endsWith('@LastModified') && !k.includes('By'))
+    .map(([, v]) => v)
+    .filter(Boolean)
+    .sort((a, b) => new Date(b) - new Date(a));
+
+  const updatedAt = fromCal('cq:lastModified') || lastModFields[0] || null;
+  // Use the oldest @LastModified as proxy for creation date
+  const createdAt = fromCal('jcr:created')
+    || (lastModFields.length ? lastModFields[lastModFields.length - 1] : null);
+
   return {
     createdAt: createdAt || null,
     updatedAt: updatedAt || null,
-    publishedAt: publishedAt || null,
-    authorName: createdBy || null,
-    updatedBy: updatedBy || null,
+    publishedAt: fromCal('cq:lastPublished') || null,
+    authorName: fromCal('jcr:createdBy') || master?.['title@LastModifiedBy'] || null,
+    updatedBy: fromCal('cq:lastModifiedBy') || master?.['title@LastModifiedBy'] || null,
   };
 }
 
@@ -59,9 +70,12 @@ async function resolveMasterData(origin, item) {
     const mediaPath = typeof master?.media === 'string' ? master.media : null;
     const content = master?.content?.html || master?.content?.plaintext || master?.content || '';
     const dates = parseCreatedAt(master);
+    // category from master.json (publish) as fallback
+    const category = typeof master?.category === 'string' ? master.category : null;
     return {
       media: mediaPath ? `${origin}${mediaPath}` : initialMedia,
       content,
+      category,
       ...dates,
     };
   } catch (_) {
@@ -99,7 +113,7 @@ async function run() {
       _path: item._path || '',
       title: item.title || '',
       slug: item.slug || '',
-      category: item.category || null,
+      category: item.category || masterData.category || null,
       description: {
         plaintext: item?.description?.plaintext || '',
       },

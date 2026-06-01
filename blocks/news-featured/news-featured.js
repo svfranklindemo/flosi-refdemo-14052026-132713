@@ -50,7 +50,7 @@ function extractNewsItem(item) {
   if (!item || typeof item !== 'object') return null;
   const title = String(item.title || '').trim();
   if (!title) return null;
-  const createdAt = calendarMeta(item, 'jcr:created')
+  const createdAt = calendarMeta(item, 'cq:lastPublished')
     || String(item.createdAt || item.publishedAt || item.updatedAt || item._createdAt || '').trim();
   return {
     path: item._path || item._id || '',

@@ -172,6 +172,8 @@ function parseAssetFields(asset) {
   return {
     authorName: asset['jcr:createdBy'] || '',
     updatedBy: asset['cq:lastModifiedBy'] || '',
+    createdAt: asset['jcr:created'] || '',
+    updatedAt: asset['cq:lastModified'] || '',
   };
 }
 
@@ -208,11 +210,6 @@ function buildAueAttrs(itemPath, prop) {
   return ` data-aue-resource="urn:aemconnection:${itemPath}/jcr:content/data/master" data-aue-prop="${prop}" data-aue-type="text"`;
 }
 
-function buildCfEditorUrl(itemPath) {
-  if (!isAuthorRuntime() || !itemPath) return '';
-  return `/assets.html${itemPath}`;
-}
-
 function buildShareUrl(network, title) {
   const pageUrl = encodeURIComponent(window.location.href);
   const text = encodeURIComponent(title || '');
@@ -222,12 +219,20 @@ function buildShareUrl(network, title) {
   return '#';
 }
 
+function formatAuthorName(raw) {
+  const value = String(raw || '').trim();
+  if (!value) return 'Redação';
+  const localPart = value.includes('@') ? value.split('@')[0] : value;
+  return localPart
+    .replace(/[._-]+/g, ' ')
+    .replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
 function renderNewsDetail(block, item) {
-  const created = formatDateTime(item.createdAt);
+  const created = formatDateTime(item.publishedAt || item.createdAt);
   const updated = formatDateTime(item.updatedAt || item.publishedAt || item.createdAt);
   const updatedAgo = formatRelativeFromNow(item.updatedAt || item.publishedAt || item.createdAt);
-  const cfEditorUrl = buildCfEditorUrl(item.id);
-  const authorName = item.authorName || 'Redação';
+  const authorName = formatAuthorName(item.authorName);
   const referenceAue = (isAuthorRuntime() && item.id)
     ? ` data-aue-resource="urn:aemconnection:${item.id}/jcr:content/data/master" data-aue-type="reference" data-aue-label="Content Fragment"`
     : '';
@@ -239,11 +244,10 @@ function renderNewsDetail(block, item) {
       <div class="news-detail-meta-row">
         <div class="news-detail-meta">
           <span class="news-detail-meta-item news-detail-author">Por ${authorName}</span>
-          ${created ? `<span class="news-detail-meta-item">${created}</span>` : ''}
+          ${created ? `<span class="news-detail-meta-item">Publicado: ${created}</span>` : ''}
           ${updated ? `<span class="news-detail-meta-item">Atualizado: ${updated}</span>` : ''}
           ${updatedAgo ? `<span class="news-detail-meta-item">(${updatedAgo})</span>` : ''}
         </div>
-        ${cfEditorUrl ? `<p class="news-detail-cf-link"><a href="${cfEditorUrl}" target="_blank" rel="noopener">Editar no Content Fragment</a></p>` : ''}
       </div>
       <div class="news-detail-share" aria-label="Compartilhar">
         <span class="news-detail-share-label">Compartilhar:</span>
@@ -330,8 +334,8 @@ export default async function decorate(block) {
   const enriched = {
     ...current,
     content: masterFields.content || current.content || '',
-    createdAt: masterFields.createdAt || current.createdAt || '',
-    updatedAt: masterFields.updatedAt || current.updatedAt || '',
+    createdAt: masterFields.createdAt || assetFields.createdAt || current.createdAt || '',
+    updatedAt: masterFields.updatedAt || assetFields.updatedAt || current.updatedAt || '',
     publishedAt: masterFields.publishedAt || current.publishedAt || '',
     authorName: masterFields.authorName || assetFields.authorName || current.authorName || '',
     updatedBy: masterFields.updatedBy || assetFields.updatedBy || current.updatedBy || '',

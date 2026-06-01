@@ -676,6 +676,18 @@ main > .section > div {
   padding: 0 24px;
 }
 
+/* Garante que nenhum bloco-wrapper ultrapasse 1200px */
+main > .section > div > div {
+  max-width: 100%;
+}
+
+/* Exceção: seções explicitamente marcadas como full-width no AEM */
+main > .section[data-sec-full-width="true"] > div,
+main > .section[data-sec-full-width="true"] > div > div {
+  max-width: 100%;
+  padding: 0;
+}
+
 main > .section:first-of-type {
   margin-top: 70px;
 }

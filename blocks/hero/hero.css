@@ -2,8 +2,12 @@
    Base Hero Layout
 --------------------------- */
 .hero-container .hero-wrapper {
-  max-width: unset;
+  max-width: 1200px;
+  margin: 0 auto;
   padding: 0;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .hero {

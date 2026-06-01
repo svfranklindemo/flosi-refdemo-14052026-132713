@@ -285,7 +285,7 @@ function renderNewsDetail(block, item) {
   block.innerHTML = `
     ${breadcrumb}
     <article class="news-detail-article"${referenceAue}>
-      `<p class="news-detail-category news-cat-badge" data-category="${(item.category || 'Nacional').toLowerCase()}"${buildAueAttrs(item.id, 'category')}>${item.category || 'Nacional'}</p>`
+      <p class="news-detail-category news-cat-badge" data-category="${(item.category || 'Nacional').toLowerCase()}"${buildAueAttrs(item.id, 'category')}>${item.category || 'Nacional'}</p>
       <h1 class="news-detail-title"${buildAueAttrs(item.id, 'title')}>${item.title}</h1>
       ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}
 

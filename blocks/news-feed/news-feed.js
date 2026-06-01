@@ -89,18 +89,19 @@ function extractNewsFromGraphql(item) {
 }
 
 function sortNewsNewestFirst(items) {
-  // Only sort if at least one item has a date — otherwise keep GraphQL order (already newest first)
   const hasDates = items.some((n) => n.createdAt);
-  if (!hasDates) return items;
-  return [...items].sort((a, b) => {
-    const aTime = Date.parse(a.createdAt || '') || 0;
-    const bTime = Date.parse(b.createdAt || '') || 0;
-    // Items without dates go to the end
-    if (!aTime && !bTime) return 0;
-    if (!aTime) return 1;
-    if (!bTime) return -1;
-    return bTime - aTime;
-  });
+  if (hasDates) {
+    return [...items].sort((a, b) => {
+      const aTime = Date.parse(a.createdAt || '') || 0;
+      const bTime = Date.parse(b.createdAt || '') || 0;
+      if (!aTime && !bTime) return 0;
+      if (!aTime) return 1;
+      if (!bTime) return -1;
+      return bTime - aTime;
+    });
+  }
+  // No dates: AEM returns oldest-first, so reverse for newest-first
+  return [...items].reverse();
 }
 
 function resolveNewsLink(slug, detailBasePath) {

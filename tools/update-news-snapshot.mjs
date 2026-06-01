@@ -11,7 +11,15 @@ function parseCreatedAt(master) {
   const createdAt = calendars.find((entry) => entry?.name === 'jcr:created')?.value || '';
   const updatedAt = calendars.find((entry) => entry?.name === 'cq:lastModified')?.value || '';
   const publishedAt = calendars.find((entry) => entry?.name === 'cq:lastPublished')?.value || '';
-  return { createdAt: createdAt || null, updatedAt: updatedAt || null, publishedAt: publishedAt || null };
+  const createdBy = calendars.find((entry) => entry?.name === 'jcr:createdBy')?.value || '';
+  const updatedBy = calendars.find((entry) => entry?.name === 'cq:lastModifiedBy')?.value || '';
+  return {
+    createdAt: createdAt || null,
+    updatedAt: updatedAt || null,
+    publishedAt: publishedAt || null,
+    authorName: createdBy || null,
+    updatedBy: updatedBy || null,
+  };
 }
 
 async function resolveMasterData(origin, item) {
@@ -23,6 +31,8 @@ async function resolveMasterData(origin, item) {
       createdAt: null,
       updatedAt: null,
       publishedAt: null,
+      authorName: null,
+      updatedBy: null,
     };
   }
 
@@ -41,6 +51,8 @@ async function resolveMasterData(origin, item) {
         createdAt: null,
         updatedAt: null,
         publishedAt: null,
+        authorName: null,
+        updatedBy: null,
       };
     }
     const master = await response.json();
@@ -59,6 +71,8 @@ async function resolveMasterData(origin, item) {
       createdAt: null,
       updatedAt: null,
       publishedAt: null,
+      authorName: null,
+      updatedBy: null,
     };
   }
 }
@@ -93,6 +107,8 @@ async function run() {
       createdAt: masterData.createdAt,
       updatedAt: masterData.updatedAt,
       publishedAt: masterData.publishedAt,
+      authorName: masterData.authorName,
+      updatedBy: masterData.updatedBy,
     };
   }));
 

@@ -76,6 +76,8 @@ function parseMasterFields(master) {
     createdAt: calendarMap['jcr:created'] || '',
     updatedAt: calendarMap['cq:lastModified'] || '',
     publishedAt: calendarMap['cq:lastPublished'] || '',
+    authorName: calendarMap['jcr:createdBy'] || '',
+    updatedBy: calendarMap['cq:lastModifiedBy'] || '',
   };
 }
 
@@ -137,6 +139,8 @@ function normalizeNewsFromGraphql(item) {
     createdAt: readValue(item.createdAt) || '',
     updatedAt: readValue(item.updatedAt) || '',
     publishedAt: readValue(item.publishedAt) || '',
+    authorName: readValue(item.authorName) || '',
+    updatedBy: readValue(item.updatedBy) || '',
   };
 }
 
@@ -150,6 +154,25 @@ async function fetchMasterJson(path) {
   } catch (_) {
     return null;
   }
+}
+
+async function fetchAssetJson(path) {
+  if (!path) return null;
+  try {
+    const response = await fetch(`${normalizePath(path)}.json`);
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (_) {
+    return null;
+  }
+}
+
+function parseAssetFields(asset) {
+  if (!asset || typeof asset !== 'object') return {};
+  return {
+    authorName: asset['jcr:createdBy'] || '',
+    updatedBy: asset['cq:lastModifiedBy'] || '',
+  };
 }
 
 async function fetchNewsFromPersistedQuery(folderPath, graphqlEndpoint, persistedQueryPath) {
@@ -200,19 +223,23 @@ function buildShareUrl(network, title) {
 }
 
 function renderNewsDetail(block, item) {
-  const published = formatDateTime(item.publishedAt || item.createdAt);
+  const created = formatDateTime(item.createdAt);
   const updated = formatDateTime(item.updatedAt || item.publishedAt || item.createdAt);
   const updatedAgo = formatRelativeFromNow(item.updatedAt || item.publishedAt || item.createdAt);
   const cfEditorUrl = buildCfEditorUrl(item.id);
+  const authorName = item.authorName || 'Redação';
+  const referenceAue = (isAuthorRuntime() && item.id)
+    ? ` data-aue-resource="urn:aemconnection:${item.id}/jcr:content/data/master" data-aue-type="reference" data-aue-label="Content Fragment"`
+    : '';
 
   block.innerHTML = `
-    <article class="news-detail-article">
+    <article class="news-detail-article"${referenceAue}>
       ${item.category ? `<p class="news-detail-category"${buildAueAttrs(item.id, 'category')}>${item.category}</p>` : ''}
       <h1 class="news-detail-title"${buildAueAttrs(item.id, 'title')}>${item.title}</h1>
       <div class="news-detail-meta-row">
         <div class="news-detail-meta">
-          <span class="news-detail-meta-item news-detail-author">Por Megamedia Noticias</span>
-          ${published ? `<span class="news-detail-meta-item">${published}</span>` : ''}
+          <span class="news-detail-meta-item news-detail-author">Por ${authorName}</span>
+          ${created ? `<span class="news-detail-meta-item">${created}</span>` : ''}
           ${updated ? `<span class="news-detail-meta-item">Atualizado: ${updated}</span>` : ''}
           ${updatedAgo ? `<span class="news-detail-meta-item">(${updatedAgo})</span>` : ''}
         </div>
@@ -297,13 +324,17 @@ export default async function decorate(block) {
   }
 
   const master = await fetchMasterJson(current.id);
+  const asset = await fetchAssetJson(current.id);
   const masterFields = parseMasterFields(master);
+  const assetFields = parseAssetFields(asset);
   const enriched = {
     ...current,
     content: masterFields.content || current.content || '',
     createdAt: masterFields.createdAt || current.createdAt || '',
     updatedAt: masterFields.updatedAt || current.updatedAt || '',
     publishedAt: masterFields.publishedAt || current.publishedAt || '',
+    authorName: masterFields.authorName || assetFields.authorName || current.authorName || '',
+    updatedBy: masterFields.updatedBy || assetFields.updatedBy || current.updatedBy || '',
   };
 
   renderNewsDetail(block, enriched);

@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "_path": "/content/dam/6a05cdafe815815bf04d6032/news-1",
+      "title": "News 1 Title",
+      "slug": "news-1-slug",
+      "description": {
+        "plaintext": "News 1 Description"
+      },
+      "media": null
+    },
+    {
+      "_path": "/content/dam/6a05cdafe815815bf04d6032/news-2",
+      "title": "News 2",
+      "slug": "news-2",
+      "description": {
+        "plaintext": "News 2"
+      },
+      "media": null
+    }
+  ]
+}

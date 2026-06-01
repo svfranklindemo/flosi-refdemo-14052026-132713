@@ -100,6 +100,17 @@ async function fetchNewsFromPersistedQuery(folderPath, graphqlEndpoint, persiste
   return extractGraphqlItems(payload).map(normalizeNewsFromGraphql).filter(Boolean);
 }
 
+async function fetchNewsFromStaticJson(edgeDataPath) {
+  const path = String(edgeDataPath || '/news-data.json').trim() || '/news-data.json';
+  const response = await fetch(path);
+  if (!response.ok) throw new Error(`Static news request failed with status ${response.status}.`);
+  const payload = await response.json();
+  const rawItems = Array.isArray(payload?.items)
+    ? payload.items
+    : extractGraphqlItems(payload);
+  return rawItems.map(normalizeNewsFromGraphql).filter(Boolean);
+}
+
 function renderNewsDetail(block, item) {
   block.innerHTML = `
     <article class="news-detail-article">
@@ -119,7 +130,7 @@ export default async function decorate(block) {
   let missingSlugText = 'Slug da notícia não encontrado na URL.';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
   let authorGraphqlEndpoint = '';
-  let edgeGraphqlEndpoint = '';
+  let edgeDataPath = '/news-data.json';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -141,9 +152,9 @@ export default async function decorate(block) {
         break;
       case 'graphqlendpoint':
       case 'graphqlhost':
-      case 'edgegraphqlendpoint':
-      case 'publishgraphqlendpoint':
-        edgeGraphqlEndpoint = value;
+      case 'edgedatapath':
+      case 'newsdatapath':
+        edgeDataPath = value;
         break;
       default: break;
     }
@@ -163,8 +174,13 @@ export default async function decorate(block) {
     return;
   }
 
-  const gqlEndpoint = resolveGraphqlEndpoint(authorGraphqlEndpoint, edgeGraphqlEndpoint);
-  const items = await fetchNewsFromPersistedQuery(contentFragmentFolder, gqlEndpoint, persistedQueryPath);
+  const items = isEdgeRuntime()
+    ? await fetchNewsFromStaticJson(edgeDataPath)
+    : await fetchNewsFromPersistedQuery(
+      contentFragmentFolder,
+      resolveGraphqlEndpoint(authorGraphqlEndpoint, ''),
+      persistedQueryPath,
+    );
 
   const current = items.find((item) => item.slug === slug);
   if (!current) {

@@ -69,9 +69,9 @@
         {
           "component": "text",
           "valueType": "string",
-          "name": "edgeGraphqlEndpoint",
-          "label": "Edge/Publish GraphQL Endpoint Base",
-          "value": ""
+          "name": "edgeDataPath",
+          "label": "Edge Static Data Path",
+          "value": "/news-data.json"
         }
       ]
     }

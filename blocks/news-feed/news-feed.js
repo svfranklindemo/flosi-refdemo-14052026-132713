@@ -1,4 +1,4 @@
-const DEBUG_VERSION = 'news-feed-graphql-v3';
+const DEBUG_VERSION = 'news-feed-hybrid-v1';
 
 function createElement(tag, className, html) {
   const element = document.createElement(tag);
@@ -166,6 +166,23 @@ async function fetchNewsFromPersistedQuery(folderPath, graphqlEndpoint, persiste
   };
 }
 
+async function fetchNewsFromStaticJson(edgeDataPath) {
+  const path = String(edgeDataPath || '/news-data.json').trim() || '/news-data.json';
+  const response = await fetch(path);
+  if (!response.ok) {
+    return { items: [], debug: { source: 'edge-static', staticPath: path, staticStatus: response.status } };
+  }
+  const payload = await response.json();
+  const rawItems = Array.isArray(payload?.items)
+    ? payload.items
+    : extractGraphqlItems(payload);
+  const items = rawItems.map(extractNewsFromGraphql).filter(Boolean);
+  return {
+    items,
+    debug: { source: 'edge-static', staticPath: path, staticStatus: response.status, staticCount: items.length },
+  };
+}
+
 export default async function decorate(block) {
   let title = 'Últimas Notícias';
   let subtitle = 'Confira as notícias mais recentes';
@@ -176,7 +193,7 @@ export default async function decorate(block) {
   let emptyStateText = 'Nenhuma notícia encontrada.';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
   let authorGraphqlEndpoint = '';
-  let edgeGraphqlEndpoint = '';
+  let edgeDataPath = '/news-data.json';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -202,9 +219,9 @@ export default async function decorate(block) {
         break;
       case 'graphqlendpoint':
       case 'graphqlhost':
-      case 'edgegraphqlendpoint':
-      case 'publishgraphqlendpoint':
-        edgeGraphqlEndpoint = value;
+      case 'edgedatapath':
+      case 'newsdatapath':
+        edgeDataPath = value;
         break;
       default: break;
     }
@@ -227,23 +244,39 @@ export default async function decorate(block) {
   }
 
   try {
-    const gqlEndpoint = resolveGraphqlEndpoint(authorGraphqlEndpoint, edgeGraphqlEndpoint);
-    const gqlResult = await fetchNewsFromPersistedQuery(contentFragmentFolder, gqlEndpoint, persistedQueryPath);
-    const items = gqlResult.items;
-    const debug = {
-      folder: normalizeFolderPath(contentFragmentFolder),
-      children: items.length,
-      source: gqlResult.debug.source,
-      gqlStatus: gqlResult.debug.gqlStatus,
-      gqlUrl: gqlResult.debug.gqlUrl,
-      gqlCount: gqlResult.debug.gqlCount || 0,
-    };
+    const result = isEdgeRuntime()
+      ? await fetchNewsFromStaticJson(edgeDataPath)
+      : await fetchNewsFromPersistedQuery(
+        contentFragmentFolder,
+        resolveGraphqlEndpoint(authorGraphqlEndpoint, ''),
+        persistedQueryPath,
+      );
+    const items = result.items;
+    const debug = isEdgeRuntime()
+      ? {
+        folder: normalizeFolderPath(contentFragmentFolder),
+        children: items.length,
+        source: result.debug.source,
+        staticStatus: result.debug.staticStatus,
+        staticPath: result.debug.staticPath,
+        staticCount: result.debug.staticCount || 0,
+      }
+      : {
+        folder: normalizeFolderPath(contentFragmentFolder),
+        children: items.length,
+        source: result.debug.source,
+        gqlStatus: result.debug.gqlStatus,
+        gqlUrl: result.debug.gqlUrl,
+        gqlCount: result.debug.gqlCount || 0,
+      };
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement(
         'p',
         'news-feed-error',
-        `Debug: folder=${debug.folder} | children=${debug.children} | source=${debug.source} | gqlStatus=${debug.gqlStatus} | gqlCount=${debug.gqlCount} | gqlUrl=${debug.gqlUrl} | debugVersion=${DEBUG_VERSION}`,
+        isEdgeRuntime()
+          ? `Debug: folder=${debug.folder} | children=${debug.children} | source=${debug.source} | staticStatus=${debug.staticStatus} | staticCount=${debug.staticCount} | staticPath=${debug.staticPath} | debugVersion=${DEBUG_VERSION}`
+          : `Debug: folder=${debug.folder} | children=${debug.children} | source=${debug.source} | gqlStatus=${debug.gqlStatus} | gqlCount=${debug.gqlCount} | gqlUrl=${debug.gqlUrl} | debugVersion=${DEBUG_VERSION}`,
       );
       list.append(info);
     }

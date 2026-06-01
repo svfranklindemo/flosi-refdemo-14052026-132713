@@ -41,7 +41,7 @@ header nav[aria-expanded='true'] {
   header nav[aria-expanded='true'] {
     min-height: 0;
     overflow: visible;
-    padding: 22px 32px;
+    padding: 6px 32px;
     height: auto;
   }
 }
@@ -190,10 +190,9 @@ header nav .nav-sections {
 
 header nav[aria-expanded='true'] .nav-sections {
   visibility: visible;
-  align-self: start;
+  align-self: center;
   display: flex;
-  visibility: visible;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
 }
 

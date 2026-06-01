@@ -573,3 +573,34 @@ picture {
     height: 200px;
   }
 }
+
+/* ── Live badge — works across all hero variants ── */
+.hero .hero-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--color-brand-live, #D85A30);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 3px;
+  margin-bottom: 14px;
+  line-height: 1;
+}
+
+.hero .hero-live-badge .live-dot {
+  width: 7px;
+  height: 7px;
+  background: #fff;
+  border-radius: 50%;
+  animation: live-pulse 1.4s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.75); }
+}

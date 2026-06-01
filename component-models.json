@@ -5793,6 +5793,13 @@
             "value": "theme-light"
           }
         ]
+      },
+      {
+        "component": "boolean",
+        "name": "livemode",
+        "label": "🔴 En Vivo (show live badge)",
+        "valueType": "boolean",
+        "value": false
       }
     ]
   },

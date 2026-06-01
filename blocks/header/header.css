@@ -222,6 +222,11 @@ header nav .nav-sections ul > li > a {
   text-decoration: none;
   font-family: var(--body-font-family);
 }
+header nav .nav-sections ul > li:first-child > a {
+  color: #e4003a;
+  font-weight: 700;
+}
+
 header nav .nav-sections ul > li > a:hover {
   color: var(--main-accent-color);
 }

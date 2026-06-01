@@ -48,7 +48,7 @@ function extractNewsItem(item) {
     path: item._path || item._id || '',
     title,
     description: readFieldValue(item.description) || '',
-    category: readFieldValue(item.category) || 'Nacional',
+    category: readFieldValue(item.category) || '',
     slug: String(item.slug || '').trim(),
     image: readFieldValue(item.media) || '',
     createdAt: String(item.createdAt || item.publishedAt || item.updatedAt || item._createdAt || '').trim(),
@@ -203,13 +203,12 @@ function buildBody(news, titleTag, detailBasePath, showDescription = false) {
   const body = document.createElement('div');
   body.className = 'nf-card-body';
 
-  if (news.category) {
-    const cat = document.createElement('span');
-    cat.className = 'nf-card-cat news-cat-badge';
-    cat.dataset.category = news.category.toLowerCase();
-    cat.textContent = news.category;
-    body.appendChild(cat);
-  }
+  const displayCat = news.category || 'Nacional';
+  const cat = document.createElement('span');
+  cat.className = 'nf-card-cat news-cat-badge';
+  cat.dataset.category = displayCat.toLowerCase();
+  cat.textContent = displayCat;
+  body.appendChild(cat);
 
   const title = document.createElement(titleTag || 'p');
   title.className = 'nf-card-title';

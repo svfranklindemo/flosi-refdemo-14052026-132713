@@ -133,7 +133,7 @@ function normalizeNewsFromGraphql(item) {
     title,
     description: readValue(item.description) || '',
     content: readValue(item.content) || '',
-    category: readValue(item.category) || 'Nacional',
+    category: readValue(item.category) || '',
     slug: String(item.slug || '').trim(),
     image: readValue(item.media) || '',
     createdAt: readValue(item.createdAt) || '',
@@ -285,7 +285,7 @@ function renderNewsDetail(block, item) {
   block.innerHTML = `
     ${breadcrumb}
     <article class="news-detail-article"${referenceAue}>
-      ${item.category ? `<p class="news-detail-category news-cat-badge" data-category="${item.category.toLowerCase()}"${buildAueAttrs(item.id, 'category')}>${item.category}</p>` : ''}
+      `<p class="news-detail-category news-cat-badge" data-category="${(item.category || 'Nacional').toLowerCase()}"${buildAueAttrs(item.id, 'category')}>${item.category || 'Nacional'}</p>`
       <h1 class="news-detail-title"${buildAueAttrs(item.id, 'title')}>${item.title}</h1>
       ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}
 

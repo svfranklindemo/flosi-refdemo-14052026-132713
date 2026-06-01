@@ -81,7 +81,7 @@ function extractNewsFromGraphql(item) {
     id: item._path || item._id || title,
     title,
     description: readFieldValue(item.description) || '',
-    category: readFieldValue(item.category) || 'Nacional',
+    category: readFieldValue(item.category) || '',
     slug: String(item.slug || '').trim(),
     image: readFieldValue(item.media) || '',
     createdAt: String(item.createdAt || item.publishedAt || item.updatedAt || item._createdAt || '').trim(),
@@ -189,7 +189,7 @@ function renderNews(items, config, container) {
         ${news.image ? `<img src="${news.image}" alt="${news.title}" loading="lazy">` : '<div class="news-card-image-placeholder"></div>'}
       </div>
       <div class="news-card-body">
-        ${news.category ? `<span class="news-card-category news-cat-badge" data-category="${news.category.toLowerCase()}">${news.category}</span>` : ''}
+        `<span class="news-card-category news-cat-badge" data-category="${(news.category || 'Nacional').toLowerCase()}">${news.category || 'Nacional'}</span>`
         <p class="news-card-title">${news.title}</p>
         ${news.description ? `<p class="news-card-description">${news.description}</p>` : ''}
         ${ago ? `<span class="news-card-meta">${ago}</span>` : ''}

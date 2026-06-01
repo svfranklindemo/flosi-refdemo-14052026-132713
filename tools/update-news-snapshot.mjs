@@ -135,10 +135,11 @@ async function run() {
   const rawItems = payload?.data?.newsList?.items || [];
   const items = await Promise.all(rawItems.map(async (item) => {
     const masterData = await resolveMasterData(origin, item);
-    // Prefer dates from GraphQL _metadata (more reliable than master.json)
-    const publishedAt = calMeta(item, 'cq:lastPublished') || masterData.publishedAt || null;
+    // GraphQL _metadata now available on publish tier (jcr:created + cq:lastModified)
+    // cq:lastPublished is only on author — use cq:lastModified as best available proxy
+    const publishedAt = calMeta(item, 'cq:lastPublished') || null; // only on author
     const createdAt   = calMeta(item, 'jcr:created')      || masterData.createdAt   || null;
-    const updatedAt   = calMeta(item, 'cq:lastModified')   || masterData.updatedAt   || null;
+    const updatedAt   = calMeta(item, 'cq:lastModified')  || masterData.updatedAt   || null;
     return {
       _path: item._path || '',
       title: item.title || '',

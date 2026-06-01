@@ -58,16 +58,19 @@
   border-bottom: 1px solid #e5e7eb;
   padding: 0.85rem 0;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   flex-wrap: wrap;
   gap: 0.55rem;
 }
 
 .news-detail-share-label {
+  display: inline-flex;
+  align-items: center;
   font-size: 0.82rem;
   color: #334155;
   font-weight: 700;
-  margin-right: 0.35rem;
+  margin-right: 0.45rem;
+  min-height: 33px;
 }
 
 .news-detail-share-link {
@@ -75,7 +78,7 @@
   align-items: center;
   justify-content: center;
   min-height: 33px;
-  padding: 0 0.82rem;
+  padding: 0 0.9rem;
   border-radius: 4px;
   border: 1px solid #cbd5e1;
   color: #334155;

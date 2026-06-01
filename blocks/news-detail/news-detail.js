@@ -277,9 +277,9 @@ function renderNewsDetail(block, item) {
       </div>
       <div class="news-detail-share" aria-label="Compartilhar">
         <span class="news-detail-share-label">Compartilhar:</span>
-        <a class="news-detail-share-link news-detail-share-x" href="${buildShareUrl('x', item.title)}" target="_blank" rel="noopener">Compartilhar no X</a>
-        <a class="news-detail-share-link news-detail-share-facebook" href="${buildShareUrl('facebook', item.title)}" target="_blank" rel="noopener">Compartilhar no Facebook</a>
-        <a class="news-detail-share-link news-detail-share-linkedin" href="${buildShareUrl('linkedin', item.title)}" target="_blank" rel="noopener">Compartilhar no LinkedIn</a>
+        <a class="news-detail-share-link news-detail-share-x" href="${buildShareUrl('x', item.title)}" target="_blank" rel="noopener">X</a>
+        <a class="news-detail-share-link news-detail-share-facebook" href="${buildShareUrl('facebook', item.title)}" target="_blank" rel="noopener">Facebook</a>
+        <a class="news-detail-share-link news-detail-share-linkedin" href="${buildShareUrl('linkedin', item.title)}" target="_blank" rel="noopener">LinkedIn</a>
       </div>
       ${item.image ? `<p class="news-detail-image"><img src="${item.image}" alt="${item.title}"></p>` : ''}
       ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}

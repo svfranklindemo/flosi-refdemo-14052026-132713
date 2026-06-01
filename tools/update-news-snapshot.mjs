@@ -99,6 +99,7 @@ async function run() {
       _path: item._path || '',
       title: item.title || '',
       slug: item.slug || '',
+      category: item.category || null,
       description: {
         plaintext: item?.description?.plaintext || '',
       },

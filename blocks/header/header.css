@@ -15,7 +15,7 @@ header nav {
   gap: 0 24px;
   margin: auto;
   max-width: 1248px;
-  height: 64px;
+  height: 72px;
   padding: 0 24px;
   font-family: var(--body-font-family);
   position: relative;
@@ -264,13 +264,16 @@ header nav .nav-sections ul > li > ul > li {
 
 @media (width >= 900px) {
   header nav .nav-sections {
-    display: block;
+    display: flex;
+    align-items: center;
     visibility: visible;
     white-space: nowrap;
+    flex: 1 1 auto;
+    justify-content: center;
   }
 
   header nav[aria-expanded='true'] .nav-sections {
-    align-self: unset;
+    align-self: center;
   }
 
   header nav .nav-sections .nav-drop {
@@ -310,7 +313,7 @@ header nav .nav-sections ul > li > ul > li {
   header nav .nav-sections .default-content-wrapper > ul > li {
     flex: 0 1 auto;
     position: relative;
-    color: #ffffff;
+    color: var(--nav-text-color);
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li > ul {

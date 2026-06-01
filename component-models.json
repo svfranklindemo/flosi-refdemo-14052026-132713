@@ -6240,10 +6240,51 @@
     "id": "ticker",
     "fields": [
       {
-        "component": "richtext",
-        "name": "text",
-        "label": "Manchetes (lista com uma por linha)",
-        "valueType": "string"
+        "component": "text",
+        "name": "edgedatapath",
+        "label": "Caminho do JSON de notícias",
+        "valueType": "string",
+        "value": "/news-data.json"
+      },
+      {
+        "component": "text",
+        "name": "maxitems",
+        "label": "Número de manchetes",
+        "valueType": "string",
+        "value": "3"
+      }
+    ]
+  },
+  {
+    "id": "news-featured",
+    "fields": [
+      {
+        "component": "text",
+        "name": "edgedatapath",
+        "label": "Caminho do JSON de notícias",
+        "valueType": "string",
+        "value": "/news-data.json"
+      },
+      {
+        "component": "text",
+        "name": "detailbasepath",
+        "label": "Caminho da página de detalhe",
+        "valueType": "string",
+        "value": "/en/news"
+      },
+      {
+        "component": "text",
+        "name": "maxitems",
+        "label": "Número de notícias (recomendado: 4)",
+        "valueType": "string",
+        "value": "4"
+      },
+      {
+        "component": "text",
+        "name": "title",
+        "label": "Título da seção",
+        "valueType": "string",
+        "value": "Noticias destacadas"
       }
     ]
   }

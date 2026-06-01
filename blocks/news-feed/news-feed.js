@@ -133,6 +133,13 @@ function resolveNewsLink(slug, detailBasePath) {
     ? firstSeg
     : (lastSeg.match(/^([a-z]{2}(?:-[a-z]{2})?)$/i)?.[1] || '');
   let finalBase = rawBase.replace(/\/+$/g, '') || '/news';
+
+  if (finalBase.startsWith('/content/')) {
+    const name = finalBase.split('/').filter(Boolean).pop()?.replace(/\.html$/i, '') || 'news';
+    finalBase = localeSegment ? `/${localeSegment}/${name}` : `/${name}`;
+  }
+
+  finalBase = finalBase.replace(/\.html$/i, '');
   const baseSegments = finalBase.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
 
   if (finalBase.startsWith('/') && baseSegments.length === 1 && localeSegment) {

@@ -6285,25 +6285,25 @@
         "value": "Noticias destacadas"
       },
       {
-        "component": "aem-content",
+        "component": "aem-content-fragment",
         "name": "cf1",
         "label": "Notícia destaque (card grande)",
         "valueType": "string"
       },
       {
-        "component": "aem-content",
+        "component": "aem-content-fragment",
         "name": "cf2",
         "label": "Notícia lateral 1",
         "valueType": "string"
       },
       {
-        "component": "aem-content",
+        "component": "aem-content-fragment",
         "name": "cf3",
         "label": "Notícia lateral 2",
         "valueType": "string"
       },
       {
-        "component": "aem-content",
+        "component": "aem-content-fragment",
         "name": "cf4",
         "label": "Notícia lateral 3",
         "valueType": "string"

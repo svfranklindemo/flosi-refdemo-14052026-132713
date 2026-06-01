@@ -196,7 +196,7 @@ function buildImageWrap(news) {
   return wrap;
 }
 
-function buildBody(news, titleTag, detailBasePath) {
+function buildBody(news, titleTag, detailBasePath, showDescription = false) {
   const body = document.createElement('div');
   body.className = 'nf-card-body';
 
@@ -211,6 +211,13 @@ function buildBody(news, titleTag, detailBasePath) {
   title.className = 'nf-card-title';
   title.textContent = news.title;
   body.appendChild(title);
+
+  if (showDescription && news.description) {
+    const desc = document.createElement('p');
+    desc.className = 'nf-card-description';
+    desc.textContent = news.description;
+    body.appendChild(desc);
+  }
 
   const ago = timeAgo(news.createdAt);
   if (ago) {
@@ -228,7 +235,7 @@ function buildBigCard(news, detailBasePath) {
   card.className = 'nf-card nf-card-big';
   card.href = resolveLink(news.slug, detailBasePath);
   card.appendChild(buildImageWrap(news));
-  card.appendChild(buildBody(news, 'strong', detailBasePath));
+  card.appendChild(buildBody(news, 'strong', detailBasePath, true));
   return card;
 }
 

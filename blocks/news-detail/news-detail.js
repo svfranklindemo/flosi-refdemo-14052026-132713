@@ -250,9 +250,14 @@ function formatAuthorName(raw) {
 }
 
 function renderNewsDetail(block, item) {
-  const created = formatDateTime(item.publishedAt || item.createdAt);
-  const updated = formatDateTime(item.updatedAt || item.publishedAt || item.createdAt);
-  const updatedAgo = formatRelativeFromNow(item.updatedAt || item.publishedAt || item.createdAt);
+  const publishedSource = item.publishedAt || item.createdAt;
+  const updatedSource = item.updatedAt || item.publishedAt || item.createdAt;
+  const created = formatDateTime(publishedSource);
+  const updated = formatDateTime(updatedSource);
+  const updatedAgo = formatRelativeFromNow(updatedSource);
+  const isSameTimestamp = Boolean(publishedSource && updatedSource)
+    && new Date(publishedSource).getTime() === new Date(updatedSource).getTime();
+  const showUpdated = Boolean(updated) && !isSameTimestamp;
   const authorName = formatAuthorName(item.authorName);
   const referenceAue = (isAuthorRuntime() && item.id)
     ? ` data-aue-resource="urn:aemconnection:${item.id}/jcr:content/data/master" data-aue-type="reference" data-aue-label="Content Fragment"`
@@ -266,15 +271,15 @@ function renderNewsDetail(block, item) {
         <div class="news-detail-meta">
           <span class="news-detail-meta-item news-detail-author">Por ${authorName}</span>
           ${created ? `<span class="news-detail-meta-item">Publicado: ${created}</span>` : ''}
-          ${updated ? `<span class="news-detail-meta-item">Atualizado: ${updated}</span>` : ''}
-          ${updatedAgo ? `<span class="news-detail-meta-item">(${updatedAgo})</span>` : ''}
+          ${showUpdated ? `<span class="news-detail-meta-item">Atualizado: ${updated}</span>` : ''}
+          ${showUpdated && updatedAgo ? `<span class="news-detail-meta-item">(${updatedAgo})</span>` : ''}
         </div>
       </div>
       <div class="news-detail-share" aria-label="Compartilhar">
         <span class="news-detail-share-label">Compartilhar:</span>
-        <a class="news-detail-share-link news-detail-share-x" href="${buildShareUrl('x', item.title)}" target="_blank" rel="noopener">X</a>
-        <a class="news-detail-share-link news-detail-share-facebook" href="${buildShareUrl('facebook', item.title)}" target="_blank" rel="noopener">f</a>
-        <a class="news-detail-share-link news-detail-share-linkedin" href="${buildShareUrl('linkedin', item.title)}" target="_blank" rel="noopener">in</a>
+        <a class="news-detail-share-link news-detail-share-x" href="${buildShareUrl('x', item.title)}" target="_blank" rel="noopener">Compartilhar no X</a>
+        <a class="news-detail-share-link news-detail-share-facebook" href="${buildShareUrl('facebook', item.title)}" target="_blank" rel="noopener">Compartilhar no Facebook</a>
+        <a class="news-detail-share-link news-detail-share-linkedin" href="${buildShareUrl('linkedin', item.title)}" target="_blank" rel="noopener">Compartilhar no LinkedIn</a>
       </div>
       ${item.image ? `<p class="news-detail-image"><img src="${item.image}" alt="${item.title}"></p>` : ''}
       ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}

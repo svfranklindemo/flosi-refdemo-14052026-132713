@@ -298,9 +298,9 @@ export default async function decorate(block) {
   block.innerHTML = '';
   block.classList.add('news-feed');
 
-  const header = createElement('div', 'news-feed-header', `
-    <h2 class="news-feed-title block-section-title">${title}</h2>
-    <a class="news-feed-ver-todas" href="${allNewsPath}">Ver todas →</a>
+  const header = createElement('div', 'block-news-header', `
+    <h2 class="block-news-title block-section-title">${title}</h2>
+    <a class="block-news-ver-todas" href="${allNewsPath}">Ver todas →</a>
   `);
   const list = createElement('div', 'news-feed-results');
   list.innerHTML = '<p class="news-feed-loading">Carregando notícias...</p>';

@@ -313,13 +313,13 @@ export default async function decorate(block) {
 
   // Section header
   const header = document.createElement('div');
-  header.className = 'nf-header';
+  header.className = 'block-news-header';
   const titleEl = document.createElement('h2');
-  titleEl.className = 'nf-title block-section-title';
+  titleEl.className = 'block-news-title block-section-title';
   titleEl.textContent = sectionTitle;
   header.appendChild(titleEl);
   const verTodas = document.createElement('a');
-  verTodas.className = 'nf-ver-todas';
+  verTodas.className = 'block-news-ver-todas';
   verTodas.href = allNewsPath;
   verTodas.textContent = 'Ver todas →';
   header.appendChild(verTodas);

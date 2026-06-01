@@ -456,6 +456,31 @@ main .block-section-title::before {
   flex-shrink: 0;
 }
 
+/* Shared news block header — used by news-feed and news-featured */
+.block-news-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.block-news-title {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.block-news-ver-todas {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--main-accent-color);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.block-news-ver-todas::after { content: none !important; }
+.block-news-ver-todas:hover { text-decoration: underline; }
+
 h1 {
   font-size: var(--heading-font-size-xxl);
 }

@@ -1,27 +1,4 @@
-/* ── Section header ──────────────────────────── */
-.news-featured .nf-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.news-featured .nf-title {
-  white-space: nowrap;
-  margin-bottom: 0;
-}
-
-.news-featured .nf-ver-todas {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--main-accent-color);
-  text-decoration: none;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.news-featured .nf-ver-todas::after { content: none !important; }
-.news-featured .nf-ver-todas:hover { text-decoration: underline; }
+/* Section header styles moved to styles.css as .block-news-header */
 
 /* ── Grid: big card left, narrow stack right ─── */
 .news-featured .nf-grid {

@@ -2,29 +2,7 @@
   padding: 0;
 }
 
-/* ── Section header ─────────────────────────── */
-.news-feed-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.news-feed-title {
-  margin: 0;
-}
-
-.news-feed-ver-todas {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--main-accent-color);
-  text-decoration: none;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.news-feed-ver-todas::after { content: none !important; }
-.news-feed-ver-todas:hover { text-decoration: underline; }
+/* Section header styles moved to styles.css as .block-news-header */
 
 /* ── Cards grid ─────────────────────────────── */
 .news-feed-results {

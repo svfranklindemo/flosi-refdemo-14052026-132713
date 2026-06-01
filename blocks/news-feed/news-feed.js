@@ -1,4 +1,4 @@
-const DEBUG_VERSION = 'news-feed-graphql-v2';
+const DEBUG_VERSION = 'news-feed-graphql-v3';
 
 function createElement(tag, className, html) {
   const element = document.createElement(tag);
@@ -10,6 +10,11 @@ function createElement(tag, className, html) {
 function isAuthorRuntime() {
   const host = window?.location?.hostname || '';
   return host.includes('author');
+}
+
+function isEdgeRuntime() {
+  const host = window?.location?.hostname || '';
+  return host.endsWith('.aem.page') || host.endsWith('.aem.live');
 }
 
 function getConfigValue(valueCell) {
@@ -38,6 +43,16 @@ function buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath) {
     return `${base}/${persisted};path=${encodeURIComponent(folder)}`;
   }
   return `${base}/graphql/execute.json/${persisted};path=${encodeURIComponent(folder)}`;
+}
+
+function resolveGraphqlEndpoint(authorGraphqlEndpoint, edgeGraphqlEndpoint) {
+  if (isAuthorRuntime()) {
+    return String(authorGraphqlEndpoint || window.location.origin).trim();
+  }
+  if (isEdgeRuntime()) {
+    return String(edgeGraphqlEndpoint || '').trim();
+  }
+  return String(authorGraphqlEndpoint || edgeGraphqlEndpoint || '').trim();
 }
 
 function readFieldValue(field) {
@@ -160,7 +175,8 @@ export default async function decorate(block) {
   let detailBasePath = '/news';
   let emptyStateText = 'Nenhuma notícia encontrada.';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
-  let graphqlEndpoint = '';
+  let authorGraphqlEndpoint = '';
+  let edgeGraphqlEndpoint = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -183,7 +199,12 @@ export default async function decorate(block) {
         break;
       case 'graphqlendpoint':
       case 'graphqlhost':
-        graphqlEndpoint = value;
+      case 'authorgraphqlendpoint':
+        authorGraphqlEndpoint = value;
+        break;
+      case 'edgegraphqlendpoint':
+      case 'publishgraphqlendpoint':
+        edgeGraphqlEndpoint = value;
         break;
       default: break;
     }
@@ -206,7 +227,8 @@ export default async function decorate(block) {
   }
 
   try {
-    const gqlResult = await fetchNewsFromPersistedQuery(contentFragmentFolder, graphqlEndpoint, persistedQueryPath);
+    const gqlEndpoint = resolveGraphqlEndpoint(authorGraphqlEndpoint, edgeGraphqlEndpoint);
+    const gqlResult = await fetchNewsFromPersistedQuery(contentFragmentFolder, gqlEndpoint, persistedQueryPath);
     const items = gqlResult.items;
     const debug = {
       folder: normalizeFolderPath(contentFragmentFolder),

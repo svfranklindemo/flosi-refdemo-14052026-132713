@@ -62,8 +62,15 @@
         {
           "component": "text",
           "valueType": "string",
-          "name": "graphqlEndpoint",
-          "label": "GraphQL Endpoint Base (optional)",
+          "name": "authorGraphqlEndpoint",
+          "label": "Author GraphQL Endpoint Base (optional)",
+          "value": ""
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "edgeGraphqlEndpoint",
+          "label": "Edge/Publish GraphQL Endpoint Base",
           "value": ""
         }
       ]

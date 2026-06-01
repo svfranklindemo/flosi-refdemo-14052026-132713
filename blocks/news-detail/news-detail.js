@@ -18,6 +18,16 @@ function normalizePath(path) {
   return String(path || '').trim().replace(/\/+$/g, '');
 }
 
+function isAuthorRuntime() {
+  const host = window?.location?.hostname || '';
+  return host.includes('author');
+}
+
+function isEdgeRuntime() {
+  const host = window?.location?.hostname || '';
+  return host.endsWith('.aem.page') || host.endsWith('.aem.live');
+}
+
 function buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath) {
   const persisted = String(persistedQueryPath || '').trim().replace(/^\/+/, '');
   if (!persisted) return '';
@@ -28,6 +38,16 @@ function buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath) {
     return `${base}/${persisted};path=${encodeURIComponent(folder)}`;
   }
   return `${base}/graphql/execute.json/${persisted};path=${encodeURIComponent(folder)}`;
+}
+
+function resolveGraphqlEndpoint(authorGraphqlEndpoint, edgeGraphqlEndpoint) {
+  if (isAuthorRuntime()) {
+    return String(authorGraphqlEndpoint || window.location.origin).trim();
+  }
+  if (isEdgeRuntime()) {
+    return String(edgeGraphqlEndpoint || '').trim();
+  }
+  return String(authorGraphqlEndpoint || edgeGraphqlEndpoint || '').trim();
 }
 
 function readValue(field) {
@@ -98,7 +118,8 @@ export default async function decorate(block) {
   let notFoundText = 'Notícia não encontrada.';
   let missingSlugText = 'Slug da notícia não encontrado na URL.';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
-  let graphqlEndpoint = '';
+  let authorGraphqlEndpoint = '';
+  let edgeGraphqlEndpoint = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -117,7 +138,12 @@ export default async function decorate(block) {
         break;
       case 'graphqlendpoint':
       case 'graphqlhost':
-        graphqlEndpoint = value;
+      case 'authorgraphqlendpoint':
+        authorGraphqlEndpoint = value;
+        break;
+      case 'edgegraphqlendpoint':
+      case 'publishgraphqlendpoint':
+        edgeGraphqlEndpoint = value;
         break;
       default: break;
     }
@@ -137,7 +163,8 @@ export default async function decorate(block) {
     return;
   }
 
-  const items = await fetchNewsFromPersistedQuery(contentFragmentFolder, graphqlEndpoint, persistedQueryPath);
+  const gqlEndpoint = resolveGraphqlEndpoint(authorGraphqlEndpoint, edgeGraphqlEndpoint);
+  const items = await fetchNewsFromPersistedQuery(contentFragmentFolder, gqlEndpoint, persistedQueryPath);
 
   const current = items.find((item) => item.slug === slug);
   if (!current) {

@@ -6,6 +6,7 @@ const output = process.env.NEWS_OUTPUT_PATH || './news-data.json';
 
 async function run() {
   const url = new URL(endpoint);
+  const origin = `${url.protocol}//${url.host}`;
   url.searchParams.set('ts', `${Date.now()}`);
   const response = await fetch(url.toString(), {
     headers: {
@@ -26,7 +27,7 @@ async function run() {
     description: {
       plaintext: item?.description?.plaintext || '',
     },
-    media: item.media?._path ? { _path: item.media._path } : null,
+    media: item.media?._path ? `${origin}${item.media._path}` : null,
   }));
 
   const outputJson = JSON.stringify({ items }, null, 2);

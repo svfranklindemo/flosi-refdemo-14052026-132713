@@ -169,11 +169,32 @@ async function fetchAssetJson(path) {
 
 function parseAssetFields(asset) {
   if (!asset || typeof asset !== 'object') return {};
+
+  const content = asset?.['jcr:content'] || {};
+  const metadata = content?.metadata || {};
+  const createdAt = asset?.['jcr:created']
+    || content?.['jcr:created']
+    || metadata?.['dc:created']
+    || metadata?.['xmp:CreateDate']
+    || '';
+  const updatedAt = asset?.['cq:lastModified']
+    || asset?.['jcr:lastModified']
+    || content?.['cq:lastModified']
+    || content?.['jcr:lastModified']
+    || metadata?.['xmp:ModifyDate']
+    || '';
+  const publishedAt = asset?.['cq:lastPublished']
+    || asset?.['cq:lastReplicated']
+    || content?.['cq:lastPublished']
+    || content?.['cq:lastReplicated']
+    || '';
+
   return {
-    authorName: asset['jcr:createdBy'] || '',
-    updatedBy: asset['cq:lastModifiedBy'] || '',
-    createdAt: asset['jcr:created'] || '',
-    updatedAt: asset['cq:lastModified'] || '',
+    authorName: asset['jcr:createdBy'] || content?.['jcr:createdBy'] || '',
+    updatedBy: asset['cq:lastModifiedBy'] || content?.['cq:lastModifiedBy'] || '',
+    createdAt,
+    updatedAt,
+    publishedAt,
   };
 }
 
@@ -251,9 +272,9 @@ function renderNewsDetail(block, item) {
       </div>
       <div class="news-detail-share" aria-label="Compartilhar">
         <span class="news-detail-share-label">Compartilhar:</span>
-        <a class="news-detail-share-link" href="${buildShareUrl('x', item.title)}" target="_blank" rel="noopener">X</a>
-        <a class="news-detail-share-link" href="${buildShareUrl('facebook', item.title)}" target="_blank" rel="noopener">Facebook</a>
-        <a class="news-detail-share-link" href="${buildShareUrl('linkedin', item.title)}" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="news-detail-share-link news-detail-share-x" href="${buildShareUrl('x', item.title)}" target="_blank" rel="noopener">X</a>
+        <a class="news-detail-share-link news-detail-share-facebook" href="${buildShareUrl('facebook', item.title)}" target="_blank" rel="noopener">f</a>
+        <a class="news-detail-share-link news-detail-share-linkedin" href="${buildShareUrl('linkedin', item.title)}" target="_blank" rel="noopener">in</a>
       </div>
       ${item.image ? `<p class="news-detail-image"><img src="${item.image}" alt="${item.title}"></p>` : ''}
       ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}
@@ -336,7 +357,7 @@ export default async function decorate(block) {
     content: masterFields.content || current.content || '',
     createdAt: masterFields.createdAt || assetFields.createdAt || current.createdAt || '',
     updatedAt: masterFields.updatedAt || assetFields.updatedAt || current.updatedAt || '',
-    publishedAt: masterFields.publishedAt || current.publishedAt || '',
+    publishedAt: masterFields.publishedAt || assetFields.publishedAt || current.publishedAt || '',
     authorName: masterFields.authorName || assetFields.authorName || current.authorName || '',
     updatedBy: masterFields.updatedBy || assetFields.updatedBy || current.updatedBy || '',
   };

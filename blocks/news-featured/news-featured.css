@@ -8,7 +8,7 @@
 
 .news-featured .nf-title {
   white-space: nowrap;
-  flex: 1;
+  margin-bottom: 0;
 }
 
 .news-featured .nf-ver-todas {

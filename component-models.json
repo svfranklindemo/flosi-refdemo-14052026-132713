@@ -305,12 +305,12 @@
       {
         "component": "select",
         "name": "tag",
-        "label": "Tag/Selo",
+        "label": "Tag",
         "valueType": "string",
         "value": "",
         "options": [
           {
-            "name": "Sem selo",
+            "name": "Sin etiqueta",
             "value": ""
           },
           {
@@ -330,8 +330,8 @@
             "value": "ÚLTIMO MINUTO"
           },
           {
-            "name": "ANÁLISE",
-            "value": "ANÁLISE"
+            "name": "ANÁLISIS",
+            "value": "ANÁLISIS"
           }
         ]
       },

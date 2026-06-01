@@ -118,13 +118,13 @@
   left: 0;
   right: 0;
   bottom: 0;
-  min-height: 38px;
-  padding: 10px 12px;
+  min-height: 0;
+  padding: 5px 10px;
   background: #151515;
   color: #fff;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.6px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   display: flex;
   align-items: center;
@@ -132,26 +132,28 @@
   text-align: center;
   line-height: 1.2;
   z-index: 2;
+  box-sizing: border-box;
+  pointer-events: none;
 }
 
 .cards > ul > li[data-card-tag-type="exclusivo"] .cards-card-image::after {
-  background: #d71920;
+  background: #e30023;
 }
 
 .cards > ul > li[data-card-tag-type="mega-investiga"] .cards-card-image::after {
-  background: #101010;
+  background: #1ea98c;
 }
 
 .cards > ul > li[data-card-tag-type="radio-infinita"] .cards-card-image::after {
-  background: #17479e;
+  background: #1ea98c;
 }
 
 .cards > ul > li[data-card-tag-type="ultimo-minuto"] .cards-card-image::after {
-  background: #ea580c;
+  background: #f05a24;
 }
 
 .cards > ul > li[data-card-tag-type="analise"] .cards-card-image::after {
-  background: #065f46;
+  background: #0083ca;
 }
 .cards > ul > li .cards-card-body {
   display: block;

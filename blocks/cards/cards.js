@@ -34,8 +34,9 @@ const KNOWN_TAGS = new Map([
   ['mega investiga', 'MEGA INVESTIGA'],
   ['radio infinita', 'RADIO INFINITA'],
   ['ultimo minuto', 'ÚLTIMO MINUTO'],
-  ['análise', 'ANÁLISE'],
-  ['analise', 'ANÁLISE'],
+  ['último minuto', 'ÚLTIMO MINUTO'],
+  ['analisis', 'ANÁLISIS'],
+  ['análisis', 'ANÁLISIS'],
 ]);
 
 function readConfigText(div) {

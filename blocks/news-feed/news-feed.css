@@ -1,21 +1,25 @@
 .news-feed {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2.3rem 1rem 2.6rem;
 }
 
 .news-feed-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid #e5e9f0;
+  padding-bottom: 0.7rem;
 }
 
 .news-feed-title {
   margin: 0;
-  font-size: 2rem;
+  font-size: clamp(1.75rem, 2.6vw, 2.25rem);
+  line-height: 1.08;
 }
 
 .news-feed-subtitle {
-  margin: 0.5rem 0 0;
-  color: #6b7280;
+  margin: 0.38rem 0 0;
+  color: #4b5563;
+  font-size: 0.96rem;
 }
 
 .news-feed-results {
@@ -25,9 +29,16 @@
 }
 
 .news-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #dce3ee;
+  border-top: 4px solid #e30023;
   background: #fff;
   overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgb(15 23 42 / 8%);
 }
 
 .news-card-image {
@@ -48,28 +59,29 @@
 }
 
 .news-card-body {
-  padding: 0.9rem;
+  padding: 1rem 1rem 1.1rem;
 }
 
 .news-card-category {
   margin: 0 0 0.5rem;
-  color: #d71920;
-  font-size: 0.8rem;
+  color: #e30023;
+  font-size: 0.74rem;
   font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .news-card-title {
   margin: 0;
-  font-size: 1.2rem;
-  line-height: 1.25;
+  font-size: 1.26rem;
+  line-height: 1.2;
 }
 
 .news-card-description {
-  margin: 0.6rem 0 0;
-  color: #4b5563;
-  font-size: 0.95rem;
-  line-height: 1.45;
+  margin: 0.68rem 0 0;
+  color: #374151;
+  font-size: 0.96rem;
+  line-height: 1.5;
 }
 
 .news-card-cta {

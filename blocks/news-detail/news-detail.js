@@ -185,19 +185,44 @@ function buildAueAttrs(itemPath, prop) {
   return ` data-aue-resource="urn:aemconnection:${itemPath}/jcr:content/data/master" data-aue-prop="${prop}" data-aue-type="text"`;
 }
 
+function buildCfEditorUrl(itemPath) {
+  if (!isAuthorRuntime() || !itemPath) return '';
+  return `/assets.html${itemPath}`;
+}
+
+function buildShareUrl(network, title) {
+  const pageUrl = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent(title || '');
+  if (network === 'x') return `https://x.com/intent/tweet?url=${pageUrl}&text=${text}`;
+  if (network === 'facebook') return `https://www.facebook.com/sharer/sharer.php?u=${pageUrl}`;
+  if (network === 'linkedin') return `https://www.linkedin.com/sharing/share-offsite/?url=${pageUrl}`;
+  return '#';
+}
+
 function renderNewsDetail(block, item) {
   const published = formatDateTime(item.publishedAt || item.createdAt);
   const updated = formatDateTime(item.updatedAt || item.publishedAt || item.createdAt);
   const updatedAgo = formatRelativeFromNow(item.updatedAt || item.publishedAt || item.createdAt);
+  const cfEditorUrl = buildCfEditorUrl(item.id);
 
   block.innerHTML = `
     <article class="news-detail-article">
       ${item.category ? `<p class="news-detail-category"${buildAueAttrs(item.id, 'category')}>${item.category}</p>` : ''}
       <h1 class="news-detail-title"${buildAueAttrs(item.id, 'title')}>${item.title}</h1>
-      <div class="news-detail-meta">
-        ${published ? `<span class="news-detail-meta-item">Publicado: ${published}</span>` : ''}
-        ${updated ? `<span class="news-detail-meta-item">Atualizado: ${updated}</span>` : ''}
-        ${updatedAgo ? `<span class="news-detail-meta-item">há ${updatedAgo}</span>` : ''}
+      <div class="news-detail-meta-row">
+        <div class="news-detail-meta">
+          <span class="news-detail-meta-item news-detail-author">Por Megamedia Noticias</span>
+          ${published ? `<span class="news-detail-meta-item">${published}</span>` : ''}
+          ${updated ? `<span class="news-detail-meta-item">Atualizado: ${updated}</span>` : ''}
+          ${updatedAgo ? `<span class="news-detail-meta-item">(${updatedAgo})</span>` : ''}
+        </div>
+        ${cfEditorUrl ? `<p class="news-detail-cf-link"><a href="${cfEditorUrl}" target="_blank" rel="noopener">Editar no Content Fragment</a></p>` : ''}
+      </div>
+      <div class="news-detail-share" aria-label="Compartilhar">
+        <span class="news-detail-share-label">Compartilhar:</span>
+        <a class="news-detail-share-link" href="${buildShareUrl('x', item.title)}" target="_blank" rel="noopener">X</a>
+        <a class="news-detail-share-link" href="${buildShareUrl('facebook', item.title)}" target="_blank" rel="noopener">Facebook</a>
+        <a class="news-detail-share-link" href="${buildShareUrl('linkedin', item.title)}" target="_blank" rel="noopener">LinkedIn</a>
       </div>
       ${item.image ? `<p class="news-detail-image"><img src="${item.image}" alt="${item.title}"></p>` : ''}
       ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}

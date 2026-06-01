@@ -84,7 +84,16 @@ function extractNewsFromGraphql(item) {
     category: readFieldValue(item.category) || '',
     slug: String(item.slug || '').trim(),
     image: readFieldValue(item.media) || '',
+    createdAt: String(item.createdAt || item._createdAt || '').trim(),
   };
+}
+
+function sortNewsNewestFirst(items) {
+  return [...items].sort((a, b) => {
+    const aTime = Date.parse(a.createdAt || '') || 0;
+    const bTime = Date.parse(b.createdAt || '') || 0;
+    return bTime - aTime;
+  });
 }
 
 function resolveNewsLink(slug, detailBasePath) {
@@ -259,7 +268,7 @@ export default async function decorate(block) {
         resolveGraphqlEndpoint(authorGraphqlEndpoint, ''),
         persistedQueryPath,
       );
-    const items = result.items;
+    const items = sortNewsNewestFirst(result.items);
     const debug = isEdgeRuntime()
       ? {
         folder: normalizeFolderPath(contentFragmentFolder),

@@ -133,6 +133,26 @@
   line-height: 1.2;
   z-index: 2;
 }
+
+.cards > ul > li[data-card-tag-type="exclusivo"] .cards-card-image::after {
+  background: #d71920;
+}
+
+.cards > ul > li[data-card-tag-type="mega-investiga"] .cards-card-image::after {
+  background: #101010;
+}
+
+.cards > ul > li[data-card-tag-type="radio-infinita"] .cards-card-image::after {
+  background: #17479e;
+}
+
+.cards > ul > li[data-card-tag-type="ultimo-minuto"] .cards-card-image::after {
+  background: #ea580c;
+}
+
+.cards > ul > li[data-card-tag-type="analise"] .cards-card-image::after {
+  background: #065f46;
+}
 .cards > ul > li .cards-card-body {
   display: block;
   background-color: var(--background-color);

@@ -29,6 +29,15 @@ const KNOWN_CARD_STYLES = new Set([
   'gradient',
 ]);
 
+const KNOWN_TAGS = new Map([
+  ['exclusivo', 'EXCLUSIVO'],
+  ['mega investiga', 'MEGA INVESTIGA'],
+  ['radio infinita', 'RADIO INFINITA'],
+  ['ultimo minuto', 'ÚLTIMO MINUTO'],
+  ['análise', 'ANÁLISE'],
+  ['analise', 'ANÁLISE'],
+]);
+
 function readConfigText(div) {
   const paragraph = div?.querySelector('p');
   return paragraph?.textContent?.trim() || '';
@@ -46,7 +55,8 @@ export default function decorate(block) {
 
     const ctaStyle = configValues.find((value) => KNOWN_CTA_STYLES.has(value)) || 'button';
     const cardStyle = configValues.find((value) => KNOWN_CARD_STYLES.has(value)) || 'default';
-    const tagLabel = configValues.find((value) => !KNOWN_CTA_STYLES.has(value) && !KNOWN_CARD_STYLES.has(value)) || '';
+    const rawTag = configValues.find((value) => KNOWN_TAGS.has(value.toLowerCase().trim())) || '';
+    const tagLabel = rawTag ? KNOWN_TAGS.get(rawTag.toLowerCase().trim()) : '';
 
     if (cardStyle && cardStyle !== 'default') {
       li.className = cardStyle;
@@ -54,6 +64,10 @@ export default function decorate(block) {
 
     if (tagLabel) {
       li.dataset.cardTag = tagLabel;
+      li.dataset.cardTagType = rawTag.toLowerCase().trim()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-');
     }
 
     moveInstrumentation(row, li);

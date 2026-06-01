@@ -50,11 +50,37 @@
           "valueType": "string"
         },
         {
-          "component": "text",
+          "component": "select",
           "name": "tag",
           "label": "Tag/Selo",
           "valueType": "string",
-          "value": ""
+          "value": "",
+          "options": [
+            {
+              "name": "Sem selo",
+              "value": ""
+            },
+            {
+              "name": "EXCLUSIVO",
+              "value": "EXCLUSIVO"
+            },
+            {
+              "name": "MEGA INVESTIGA",
+              "value": "MEGA INVESTIGA"
+            },
+            {
+              "name": "RADIO INFINITA",
+              "value": "RADIO INFINITA"
+            },
+            {
+              "name": "ÚLTIMO MINUTO",
+              "value": "ÚLTIMO MINUTO"
+            },
+            {
+              "name": "ANÁLISE",
+              "value": "ANÁLISE"
+            }
+          ]
         },
         {
           "component": "select",

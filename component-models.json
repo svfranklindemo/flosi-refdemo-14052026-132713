@@ -5797,6 +5797,25 @@
     ]
   },
   {
+    "id": "html-css",
+    "fields": [
+      {
+        "component": "multiline",
+        "name": "html",
+        "label": "HTML",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "multiline",
+        "name": "css",
+        "label": "CSS",
+        "valueType": "string",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "iframe",
     "fields": [
       {

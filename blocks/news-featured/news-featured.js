@@ -205,7 +205,8 @@ function buildBody(news, titleTag, detailBasePath, showDescription = false) {
 
   if (news.category) {
     const cat = document.createElement('span');
-    cat.className = 'nf-card-cat';
+    cat.className = 'nf-card-cat news-cat-badge';
+    cat.dataset.category = news.category.toLowerCase();
     cat.textContent = news.category;
     body.appendChild(cat);
   }

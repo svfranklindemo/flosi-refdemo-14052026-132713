@@ -13,7 +13,8 @@
       "updatedAt": null,
       "publishedAt": "2026-06-01T08:00:00Z",
       "authorName": null,
-      "updatedBy": null
+      "updatedBy": null,
+      "category": "Economía"
     },
     {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/ia-revoluciona-medicina-2026",
@@ -28,7 +29,8 @@
       "updatedAt": null,
       "publishedAt": "2026-06-01T09:25:00Z",
       "authorName": null,
-      "updatedBy": null
+      "updatedBy": null,
+      "category": "Mega Investiga"
     },
     {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/megamedia-chile-streaming-2026",
@@ -43,7 +45,8 @@
       "updatedAt": null,
       "publishedAt": "2026-06-01T05:00:00Z",
       "authorName": null,
-      "updatedBy": null
+      "updatedBy": null,
+      "category": "Entretenimiento"
     },
     {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/megamedia-novela-entre-lagrimas-y-secretos-2026",
@@ -58,7 +61,8 @@
       "updatedAt": null,
       "publishedAt": "2026-06-01T09:00:00Z",
       "authorName": null,
-      "updatedBy": null
+      "updatedBy": null,
+      "category": "Nacional"
     },
     {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/news-1",
@@ -73,7 +77,8 @@
       "updatedAt": null,
       "publishedAt": "2026-05-31T07:00:00Z",
       "authorName": null,
-      "updatedBy": null
+      "updatedBy": null,
+      "category": "Política"
     },
     {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/news-2",
@@ -88,7 +93,8 @@
       "updatedAt": null,
       "publishedAt": "2026-05-30T10:00:00Z",
       "authorName": null,
-      "updatedBy": null
+      "updatedBy": null,
+      "category": "Deportes"
     }
   ]
 }

@@ -456,6 +456,30 @@ main .block-section-title::before {
   flex-shrink: 0;
 }
 
+/* ── Category color tokens ───────────────────────────
+   Used by news-detail, news-feed, news-featured
+   Applied via data-category attribute on the badge/label
+*/
+[data-category="nacional"]        { --cat-color: #085041; --cat-bg: #E1F5EE; }
+[data-category="política"]        { --cat-color: #1e40af; --cat-bg: #dbeafe; }
+[data-category="mega investiga"]  { --cat-color: #6d28d9; --cat-bg: #ede9fe; }
+[data-category="deportes"]        { --cat-color: #b45309; --cat-bg: #fef3c7; }
+[data-category="economía"]        { --cat-color: #0e7490; --cat-bg: #cffafe; }
+[data-category="entretenimiento"] { --cat-color: #be185d; --cat-bg: #fce7f3; }
+
+.news-cat-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 3px;
+  color: var(--cat-color, var(--main-accent-color));
+  background: var(--cat-bg, #E1F5EE);
+  white-space: nowrap;
+}
+
 /* Shared news block header — used by news-feed and news-featured */
 .block-news-header {
   display: flex;

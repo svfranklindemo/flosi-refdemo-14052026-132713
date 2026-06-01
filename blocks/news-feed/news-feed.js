@@ -261,6 +261,7 @@ export default async function decorate(block) {
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
   let authorGraphqlEndpoint = '';
   let edgeDataPath = '/news-data.json';
+  let categoryFilter = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -291,6 +292,7 @@ export default async function decorate(block) {
       case 'newsdatapath':
         edgeDataPath = value;
         break;
+      case 'category': categoryFilter = value; break;
       default: break;
     }
   });
@@ -319,7 +321,10 @@ export default async function decorate(block) {
         resolveGraphqlEndpoint(authorGraphqlEndpoint, ''),
         persistedQueryPath,
       );
-    const items = sortNewsNewestFirst(result.items);
+    const filtered = categoryFilter
+      ? result.items.filter((n) => n.category?.toLowerCase() === categoryFilter.toLowerCase())
+      : result.items;
+    const items = sortNewsNewestFirst(filtered);
     const debug = isEdgeRuntime()
       ? {
         folder: normalizeFolderPath(contentFragmentFolder),

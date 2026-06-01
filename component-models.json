@@ -5948,6 +5948,22 @@
         "name": "edgeDataPath",
         "label": "Edge Static Data Path",
         "value": "/news-data.json"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "category",
+        "label": "Filter by Category (optional)",
+        "value": "",
+        "options": [
+          { "name": "All", "value": "" },
+          { "name": "Nacional", "value": "Nacional" },
+          { "name": "Política", "value": "Política" },
+          { "name": "Mega Investiga", "value": "Mega Investiga" },
+          { "name": "Deportes", "value": "Deportes" },
+          { "name": "Economía", "value": "Economía" },
+          { "name": "Entretenimiento", "value": "Entretenimiento" }
+        ]
       }
     ]
   },

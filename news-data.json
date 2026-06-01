@@ -8,7 +8,12 @@
         "plaintext": "Pesquisadores anunciam que sistemas de inteligência artificial já superam médicos especialistas na detecção precoce de câncer e doenças cardíacas, marcando uma virada histórica na medicina moderna."
       },
       "media": null,
-      "createdAt": null
+      "content": "<p>Um consórcio internacional de universidades e hospitais divulgou nesta semana um relatório histórico: sistemas de <strong>inteligência artificial</strong> conseguem identificar tumores malignos com 97,4% de precisão, superando a média de 89% dos radiologistas humanos.</p><p>O projeto <em>MediAI Global</em> envolveu mais de 200 instituições em 40 países e analisou 18 milhões de exames de imagem. Os algoritmos também preveem infartos com até 72 horas de antecedência, tendo já salvado mais de 34 mil vidas em 2026.</p>",
+      "createdAt": null,
+      "updatedAt": null,
+      "publishedAt": null,
+      "authorName": null,
+      "updatedBy": null
     },
     {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/news-1",
@@ -18,7 +23,12 @@
         "plaintext": "News 1 Description"
       },
       "media": "https://publish-p165802-e1765367.adobeaemcloud.com/content/dam/6a05cdafe815815bf04d6032/Firefly_Student studying at a coffee shop with laptop and notebooks, warm daylight, inspirati 905913 (1).jpg",
-      "createdAt": null
+      "content": "<p>News 1 Content</p>",
+      "createdAt": null,
+      "updatedAt": null,
+      "publishedAt": null,
+      "authorName": null,
+      "updatedBy": null
     },
     {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/news-2",
@@ -28,7 +38,12 @@
         "plaintext": "News 2"
       },
       "media": "https://publish-p165802-e1765367.adobeaemcloud.com/content/dam/6a05cdafe815815bf04d6032/Firefly_Restaurante.jpeg",
-      "createdAt": null
+      "content": "<p>News 2</p>",
+      "createdAt": null,
+      "updatedAt": null,
+      "publishedAt": null,
+      "authorName": null,
+      "updatedBy": null
     }
   ]
 }

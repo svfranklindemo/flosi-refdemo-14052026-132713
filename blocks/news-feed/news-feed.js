@@ -111,17 +111,27 @@ function resolveNewsLink(slug, detailBasePath) {
   if (isAuthorRuntime()) {
     const current = window.location.pathname;
     const pagePath = current.replace(/\/+$/, '');
+    const pageName = pagePath.split('/').pop() || '';
+    const pageNameNoExt = pageName.replace(/\.html$/i, '');
     const parent = pagePath.substring(0, pagePath.lastIndexOf('/') + 1);
     const detailSegments = rawBase.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
     const detailName = detailSegments[detailSegments.length - 1] || 'news';
     if (rawBase.includes('.html') || rawBase.startsWith('/content/')) {
       return withSlugQuery(rawBase);
     }
+    if (!parent.endsWith(`/${pageNameNoExt}/`) && /^[a-z]{2}(?:-[a-z]{2})?$/i.test(pageNameNoExt)) {
+      return withSlugQuery(`${parent}${pageNameNoExt}/${detailName}.html`);
+    }
     return withSlugQuery(`${parent}${detailName}.html`);
   }
 
   const currentPath = window.location.pathname.replace(/\/+$/, '');
-  const localeSegment = currentPath.split('/').filter(Boolean)[0] || '';
+  const pathSegments = currentPath.split('/').filter(Boolean);
+  const firstSeg = pathSegments[0] || '';
+  const lastSeg = pathSegments[pathSegments.length - 1] || '';
+  const localeSegment = /^[a-z]{2}(?:-[a-z]{2})?$/i.test(firstSeg)
+    ? firstSeg
+    : (lastSeg.match(/^([a-z]{2}(?:-[a-z]{2})?)$/i)?.[1] || '');
   let finalBase = rawBase.replace(/\/+$/g, '') || '/news';
   const baseSegments = finalBase.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
 

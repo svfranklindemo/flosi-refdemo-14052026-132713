@@ -79,7 +79,7 @@
 
 .news-featured .nf-card-big .nf-card-title {
   display: block;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   line-height: 1.35;
   color: var(--dark-color);
@@ -120,7 +120,7 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 600;
   line-height: 1.4;
   color: var(--dark-color);

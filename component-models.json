@@ -5782,13 +5782,6 @@
         "value": "Slug da notícia não encontrado na URL."
       },
       {
-        "component": "multiline",
-        "valueType": "string",
-        "name": "manualNewsPaths",
-        "label": "Manual News Paths (one per line, optional)",
-        "value": ""
-      },
-      {
         "component": "text",
         "valueType": "string",
         "name": "persistedQueryPath",
@@ -5858,13 +5851,6 @@
         "name": "emptyStateText",
         "label": "Empty State Text",
         "value": "Nenhuma notícia encontrada."
-      },
-      {
-        "component": "multiline",
-        "valueType": "string",
-        "name": "manualNewsPaths",
-        "label": "Manual News Paths (one per line, optional)",
-        "value": ""
       },
       {
         "component": "text",

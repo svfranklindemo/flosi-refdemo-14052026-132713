@@ -18,24 +18,16 @@ function normalizePath(path) {
   return String(path || '').trim().replace(/\/+$/g, '');
 }
 
-function parseManualPaths(raw) {
-  if (!raw) return [];
-  return raw
-    .split(/\r?\n|,/g)
-    .map((item) => item.trim())
-    .filter((item) => item.startsWith('/content/dam/'));
-}
-
 function buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath) {
   const persisted = String(persistedQueryPath || '').trim().replace(/^\/+/, '');
   if (!persisted) return '';
   const folder = normalizePath(folderPath);
   const base = String(graphqlEndpoint || '').trim().replace(/\/+$/g, '');
+  if (!base) return '';
   if (base.includes('/graphql/execute.json')) {
     return `${base}/${persisted};path=${encodeURIComponent(folder)}`;
   }
-  const prefix = base ? `${base}` : '';
-  return `${prefix}/graphql/execute.json/${persisted};path=${encodeURIComponent(folder)}`;
+  return `${base}/graphql/execute.json/${persisted};path=${encodeURIComponent(folder)}`;
 }
 
 function readValue(field) {
@@ -64,48 +56,6 @@ function getSlugFromPath(detailBasePath) {
   return decodeURIComponent((remainder.split('/')[0] || '').trim());
 }
 
-async function fetchAssetsViaQueryBuilder(folderPath) {
-  const params = new URLSearchParams({
-    path: folderPath,
-    type: 'dam:Asset',
-    '1_property': 'jcr:content/contentFragment',
-    '1_property.value': 'true',
-    'p.limit': '100',
-    'p.hits': 'full',
-    'p.properties': 'path jcr:path',
-  });
-  const response = await fetch(`/bin/querybuilder.json?${params.toString()}`);
-  if (!response.ok) return [];
-  const payload = await response.json();
-  const hits = Array.isArray(payload?.hits) ? payload.hits : [];
-  return hits
-    .map((hit) => hit?.path || hit?.['jcr:path'] || '')
-    .filter((path) => typeof path === 'string' && path.startsWith('/content/dam/'))
-    .map((path) => path.replace(/\/jcr:content$/i, ''));
-}
-
-async function fetchMaster(path) {
-  const url = `${normalizePath(path)}/jcr:content/data/master.json`;
-  const response = await fetch(url);
-  if (!response.ok) return null;
-  return response.json();
-}
-
-function normalizeNews(master, path) {
-  if (!master || typeof master !== 'object') return null;
-  const title = String(master.title || '').trim();
-  if (!title) return null;
-  return {
-    id: path,
-    title,
-    description: readValue(master.description) || '',
-    content: readValue(master.content) || '',
-    category: readValue(master.category) || '',
-    slug: String(master.slug || '').trim(),
-    image: readValue(master.media) || '',
-  };
-}
-
 function normalizeNewsFromGraphql(item) {
   if (!item || typeof item !== 'object') return null;
   const title = String(item.title || '').trim();
@@ -123,9 +73,9 @@ function normalizeNewsFromGraphql(item) {
 
 async function fetchNewsFromPersistedQuery(folderPath, graphqlEndpoint, persistedQueryPath) {
   const gqlUrl = buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath);
-  if (!gqlUrl) return [];
+  if (!gqlUrl) throw new Error('GraphQL Endpoint Base is required.');
   const response = await fetch(gqlUrl);
-  if (!response.ok) return [];
+  if (!response.ok) throw new Error(`GraphQL request failed with status ${response.status}.`);
   const payload = await response.json();
   return extractGraphqlItems(payload).map(normalizeNewsFromGraphql).filter(Boolean);
 }
@@ -147,7 +97,6 @@ export default async function decorate(block) {
   let detailBasePath = '/news';
   let notFoundText = 'Notícia não encontrada.';
   let missingSlugText = 'Slug da notícia não encontrado na URL.';
-  let manualNewsPaths = '';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
   let graphqlEndpoint = '';
 
@@ -162,11 +111,6 @@ export default async function decorate(block) {
       case 'detailbasepath': detailBasePath = value; break;
       case 'notfoundtext': notFoundText = value; break;
       case 'missingslugtext': missingSlugText = value; break;
-      case 'manualnewspaths':
-      case 'manualnewspathsoneperlineoptional':
-      case 'manualnewspathscommaseparatedoptional':
-        manualNewsPaths = value;
-        break;
       case 'persistedquerypath':
       case 'persistedquery':
         persistedQueryPath = value;
@@ -193,17 +137,7 @@ export default async function decorate(block) {
     return;
   }
 
-  let items = await fetchNewsFromPersistedQuery(contentFragmentFolder, graphqlEndpoint, persistedQueryPath);
-  if (!items.length) {
-    const manualPaths = parseManualPaths(manualNewsPaths);
-    const paths = manualPaths.length
-      ? manualPaths
-      : await fetchAssetsViaQueryBuilder(normalizePath(contentFragmentFolder));
-    const masters = await Promise.all(paths.map((path) => fetchMaster(path)));
-    items = masters
-      .map((master, index) => normalizeNews(master, paths[index]))
-      .filter(Boolean);
-  }
+  const items = await fetchNewsFromPersistedQuery(contentFragmentFolder, graphqlEndpoint, persistedQueryPath);
 
   const current = items.find((item) => item.slug === slug);
   if (!current) {

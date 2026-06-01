@@ -1,4 +1,4 @@
-const DEBUG_VERSION = 'news-feed-graphql-v1';
+const DEBUG_VERSION = 'news-feed-graphql-v2';
 
 function createElement(tag, className, html) {
   const element = document.createElement(tag);
@@ -28,24 +28,16 @@ function normalizeFolderPath(path) {
     .replace(/\/+$/g, '');
 }
 
-function parseManualPaths(raw) {
-  if (!raw) return [];
-  return raw
-    .split(/\r?\n|,/g)
-    .map((item) => item.trim())
-    .filter((item) => item.startsWith('/content/dam/'));
-}
-
 function buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath) {
   const persisted = String(persistedQueryPath || '').trim().replace(/^\/+/, '');
   if (!persisted) return '';
   const folder = normalizeFolderPath(folderPath);
   const base = String(graphqlEndpoint || '').trim().replace(/\/+$/g, '');
+  if (!base) return '';
   if (base.includes('/graphql/execute.json')) {
     return `${base}/${persisted};path=${encodeURIComponent(folder)}`;
   }
-  const prefix = base ? `${base}` : '';
-  return `${prefix}/graphql/execute.json/${persisted};path=${encodeURIComponent(folder)}`;
+  return `${base}/graphql/execute.json/${persisted};path=${encodeURIComponent(folder)}`;
 }
 
 function readFieldValue(field) {
@@ -64,69 +56,6 @@ function extractGraphqlItems(payload) {
   const key = Object.keys(data).find((k) => k.endsWith('List') || k.endsWith('Paginated'));
   if (!key) return [];
   return Array.isArray(data[key]?.items) ? data[key].items : [];
-}
-
-async function fetchJsonWithStatus(urls) {
-  for (let i = 0; i < urls.length; i += 1) {
-    const url = urls[i];
-    try {
-      const response = await fetch(url);
-      if (!response.ok) continue;
-      const json = await response.json();
-      return { json, status: response.status, url };
-    } catch (e) {
-      // continue
-    }
-  }
-  return { json: null, status: 'not-found', url: urls[0] || '' };
-}
-
-async function fetchAssetsViaQueryBuilder(folderPath) {
-  const params = new URLSearchParams({
-    path: folderPath,
-    type: 'dam:Asset',
-    '1_property': 'jcr:content/contentFragment',
-    '1_property.value': 'true',
-    'p.limit': '100',
-    'p.hits': 'full',
-    'p.properties': 'path jcr:path',
-  });
-  const qbUrl = `/bin/querybuilder.json?${params.toString()}`;
-  const response = await fetch(qbUrl);
-  if (!response.ok) {
-    return { paths: [], debug: { qbUrl, qbStatus: response.status, qbTotal: 0, qbSample: '' } };
-  }
-
-  const payload = await response.json();
-  const hits = Array.isArray(payload?.hits) ? payload.hits : [];
-  const paths = hits
-    .map((hit) => hit?.path || hit?.['jcr:path'] || hit?.['@path'] || '')
-    .filter((path) => typeof path === 'string' && path.startsWith('/content/dam/'))
-    .map((path) => path.replace(/\/jcr:content$/i, ''));
-
-  return {
-    paths: [...new Set(paths)],
-    debug: {
-      qbUrl,
-      qbStatus: response.status,
-      qbTotal: Number.parseInt(payload?.total, 10) || paths.length || 0,
-      qbSample: paths.slice(0, 3).join(','),
-    },
-  };
-}
-
-function extractNewsFromMaster(masterJson, path) {
-  if (!masterJson || typeof masterJson !== 'object') return null;
-  const title = String(masterJson.title || '').trim();
-  if (!title) return null;
-  return {
-    id: path,
-    title,
-    description: readFieldValue(masterJson.description) || '',
-    category: readFieldValue(masterJson.category) || '',
-    slug: String(masterJson.slug || '').trim(),
-    image: readFieldValue(masterJson.media) || '',
-  };
 }
 
 function extractNewsFromGraphql(item) {
@@ -194,49 +123,11 @@ function renderNews(items, config, container) {
   });
 }
 
-async function fetchNewsFromPaths(paths) {
-  const cfFetchDebug = [];
-  const results = await Promise.allSettled(
-    paths.map(async (path) => {
-      const masterUrl = `${normalizeFolderPath(path)}/jcr:content/data/master.json`;
-      const cf = await fetchJsonWithStatus([masterUrl]);
-      cfFetchDebug.push(`${path}=>${cf.status}`);
-      if (!cf.json) return null;
-      return extractNewsFromMaster(cf.json, path);
-    }),
-  );
-
-  const items = results
-    .filter((result) => result.status === 'fulfilled' && result.value)
-    .map((result) => result.value);
-
-  return { items, cfFetchDebug };
-}
-
-async function fetchNewsFromFolder(folderPath) {
-  const normalized = normalizeFolderPath(folderPath);
-  const qb = await fetchAssetsViaQueryBuilder(normalized);
-  const { items, cfFetchDebug } = await fetchNewsFromPaths(qb.paths);
-
-  return {
-    items,
-    debug: {
-      folder: normalized,
-      children: qb.paths.length,
-      qbStatus: qb.debug.qbStatus,
-      qbTotal: qb.debug.qbTotal,
-      qbSample: qb.debug.qbSample,
-      qbUrl: qb.debug.qbUrl,
-      cfFetch: cfFetchDebug.slice(0, 4).join(' | '),
-    },
-  };
-}
-
 async function fetchNewsFromPersistedQuery(folderPath, graphqlEndpoint, persistedQueryPath) {
   const normalized = normalizeFolderPath(folderPath);
   const gqlUrl = buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, normalized);
   if (!gqlUrl) {
-    return { items: [], debug: { source: 'graphql-missing-config', gqlUrl: '', gqlStatus: 'not-configured' } };
+    return { items: [], debug: { source: 'graphql', gqlUrl: '', gqlStatus: 'missing-graphqlEndpoint', gqlCount: 0 } };
   }
 
   const response = await fetch(gqlUrl);
@@ -268,7 +159,6 @@ export default async function decorate(block) {
   let ctaLabel = 'Ver detalhes';
   let detailBasePath = '/news';
   let emptyStateText = 'Nenhuma notícia encontrada.';
-  let manualNewsPaths = '';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
   let graphqlEndpoint = '';
 
@@ -287,11 +177,6 @@ export default async function decorate(block) {
       case 'ctalabel': ctaLabel = value; break;
       case 'detailbasepath': detailBasePath = value; break;
       case 'emptystatetext': emptyStateText = value; break;
-      case 'manualnewspaths':
-      case 'manualnewspathsoneperlineoptional':
-      case 'manualnewspathscommaseparatedoptional':
-        manualNewsPaths = value;
-        break;
       case 'persistedquerypath':
       case 'persistedquery':
         persistedQueryPath = value;
@@ -321,57 +206,22 @@ export default async function decorate(block) {
   }
 
   try {
-    const manualPaths = parseManualPaths(manualNewsPaths);
-    let items = [];
-    let debug = null;
     const gqlResult = await fetchNewsFromPersistedQuery(contentFragmentFolder, graphqlEndpoint, persistedQueryPath);
-    if (gqlResult.items.length) {
-      items = gqlResult.items;
-      debug = {
-        folder: normalizeFolderPath(contentFragmentFolder),
-        children: gqlResult.items.length,
-        qbStatus: 'n/a',
-        qbTotal: gqlResult.items.length,
-        qbSample: gqlResult.items.slice(0, 3).map((x) => x.id).join(','),
-        qbUrl: 'n/a',
-        cfFetch: 'n/a',
-        manualCount: manualPaths.length,
-        manualSample: manualPaths.slice(0, 3).join(','),
-        source: gqlResult.debug.source,
-        gqlStatus: gqlResult.debug.gqlStatus,
-        gqlUrl: gqlResult.debug.gqlUrl,
-      };
-    } else if (manualPaths.length) {
-      const result = await fetchNewsFromPaths(manualPaths);
-      items = result.items;
-      debug = {
-        folder: normalizeFolderPath(contentFragmentFolder),
-        children: manualPaths.length,
-        qbStatus: 'manual',
-        qbTotal: manualPaths.length,
-        qbSample: manualPaths.slice(0, 3).join(','),
-        qbUrl: 'manual',
-        cfFetch: result.cfFetchDebug.slice(0, 4).join(' | '),
-        manualCount: manualPaths.length,
-        manualSample: manualPaths.slice(0, 3).join(','),
-        source: 'manual',
-        gqlStatus: gqlResult.debug.gqlStatus,
-        gqlUrl: gqlResult.debug.gqlUrl,
-      };
-    } else {
-      ({ items, debug } = await fetchNewsFromFolder(contentFragmentFolder));
-      debug.manualCount = 0;
-      debug.manualSample = '';
-      debug.source = 'querybuilder';
-      debug.gqlStatus = gqlResult.debug.gqlStatus;
-      debug.gqlUrl = gqlResult.debug.gqlUrl;
-    }
+    const items = gqlResult.items;
+    const debug = {
+      folder: normalizeFolderPath(contentFragmentFolder),
+      children: items.length,
+      source: gqlResult.debug.source,
+      gqlStatus: gqlResult.debug.gqlStatus,
+      gqlUrl: gqlResult.debug.gqlUrl,
+      gqlCount: gqlResult.debug.gqlCount || 0,
+    };
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement(
         'p',
         'news-feed-error',
-        `Debug: folder=${debug.folder} | children=${debug.children} | source=${debug.source} | gqlStatus=${debug.gqlStatus} | gqlUrl=${debug.gqlUrl} | qbStatus=${debug.qbStatus} | qbTotal=${debug.qbTotal} | qbSample=${debug.qbSample} | manualCount=${debug.manualCount} | manualSample=${debug.manualSample} | cfFetch=${debug.cfFetch} | qbUrl=${debug.qbUrl} | debugVersion=${DEBUG_VERSION}`,
+        `Debug: folder=${debug.folder} | children=${debug.children} | source=${debug.source} | gqlStatus=${debug.gqlStatus} | gqlCount=${debug.gqlCount} | gqlUrl=${debug.gqlUrl} | debugVersion=${DEBUG_VERSION}`,
       );
       list.append(info);
     }

@@ -1,12 +1,11 @@
-/* ── Header ──────────────────────────────────── */
+/* ── Section header ──────────────────────────── */
 .news-featured .nf-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
   margin-bottom: 20px;
 }
 
-/* O h2.block-section-title já é estilizado pelo tema */
 .news-featured .nf-title {
   white-space: nowrap;
   flex: 1;
@@ -21,18 +20,13 @@
   flex-shrink: 0;
 }
 
-.news-featured .nf-ver-todas::after {
-  content: none !important;
-}
+.news-featured .nf-ver-todas::after { content: none !important; }
+.news-featured .nf-ver-todas:hover { text-decoration: underline; }
 
-.news-featured .nf-ver-todas:hover {
-  text-decoration: underline;
-}
-
-/* ── Grid ────────────────────────────────────── */
+/* ── Grid: big card left, narrow stack right ─── */
 .news-featured .nf-grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.85fr 0.85fr;
   gap: 24px;
   align-items: start;
 }
@@ -53,17 +47,10 @@
   transition: opacity 0.2s ease;
 }
 
-.news-featured .nf-card::after {
-  content: none !important;
-  display: none !important;
-}
+.news-featured .nf-card::after { content: none !important; display: none !important; }
+.news-featured .nf-card:hover { opacity: 0.85; text-decoration: none !important; }
 
-.news-featured .nf-card:hover {
-  opacity: 0.85;
-  text-decoration: none !important;
-}
-
-/* ── Imagem ──────────────────────────────────── */
+/* ── Card image ──────────────────────────────── */
 .news-featured .nf-card-image {
   overflow: hidden;
   background: linear-gradient(135deg, #c8e6de 0%, #a8d5c8 100%);
@@ -79,14 +66,11 @@
   transition: transform 0.3s ease;
 }
 
-.news-featured .nf-card:hover .nf-card-image img {
-  transform: scale(1.03);
-}
+.news-featured .nf-card:hover .nf-card-image img { transform: scale(1.03); }
 
-/* ── Card grande (destaque) ──────────────────── */
+/* ── Big card ────────────────────────────────── */
 .news-featured .nf-card-big .nf-card-image {
-  height: 220px;
-  border-radius: 0;
+  height: 230px;
 }
 
 .news-featured .nf-card-big .nf-card-body {
@@ -95,7 +79,7 @@
 
 .news-featured .nf-card-big .nf-card-title {
   display: block;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.4;
   color: var(--dark-color);
@@ -117,23 +101,17 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
-.news-featured .nf-stack .nf-card-horiz:first-child {
-  padding-top: 0;
-}
-
-.news-featured .nf-stack .nf-card-horiz:last-child {
-  border-bottom: none;
-}
+.news-featured .nf-stack .nf-card-horiz:first-child { padding-top: 0; }
+.news-featured .nf-stack .nf-card-horiz:last-child { border-bottom: none; }
 
 .news-featured .nf-card-horiz .nf-card-image {
-  width: 88px;
-  height: 66px;
+  width: 80px;
+  height: 62px;
   flex-shrink: 0;
-  border-radius: 0;
 }
 
 .news-featured .nf-card-horiz .nf-card-body {
-  padding: 0 0 0 12px;
+  padding: 0 0 0 10px;
   flex: 1;
 }
 
@@ -143,26 +121,31 @@
   font-weight: 600;
   line-height: 1.4;
   color: var(--dark-color);
-  margin: 3px 0 6px;
+  margin: 3px 0 5px;
   white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* ── Categoria ───────────────────────────────── */
+/* ── Category — same standard across all news blocks ── */
 .news-featured .nf-card-cat {
   display: inline-block;
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--main-accent-color);
+  margin-bottom: 2px;
 }
 
-/* ── Description (só no card grande) ────────── */
+/* ── Description ─────────────────────────────── */
 .news-featured .nf-card-description {
   font-size: 13px;
   color: #555;
   line-height: 1.5;
-  margin: 6px 0 8px;
+  margin: 4px 0 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -172,9 +155,10 @@
 
 /* ── Timestamp ───────────────────────────────── */
 .news-featured .nf-card-meta {
-  font-size: 10px;
-  color: #999;
   display: block;
+  font-size: 11px;
+  color: #999;
+  margin-top: 4px;
 }
 
 /* ── Responsive ──────────────────────────────── */

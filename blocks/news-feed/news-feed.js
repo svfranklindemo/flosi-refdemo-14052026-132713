@@ -154,6 +154,19 @@ function resolveNewsLink(slug, detailBasePath) {
   return withSlugQuery(finalBase);
 }
 
+function timeAgo(dateStr) {
+  if (!dateStr) return '';
+  const diff = Date.now() - Date.parse(dateStr);
+  if (Number.isNaN(diff) || diff < 0) return '';
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return 'Ahora';
+  if (min < 60) return `Hace ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `Hace ${h} h`;
+  const d = Math.floor(h / 24);
+  return `Hace ${d} día${d !== 1 ? 's' : ''}`;
+}
+
 function renderNews(items, config, container) {
   container.innerHTML = '';
   if (!items.length) {
@@ -163,18 +176,22 @@ function renderNews(items, config, container) {
 
   items.forEach((news) => {
     const href = resolveNewsLink(news.slug, config.detailBasePath);
+    const ago = timeAgo(news.createdAt);
     const card = createElement('article', 'news-card');
     card.innerHTML = `
       <div class="news-card-image">
-        ${news.image ? `<img src="${news.image}" alt="${news.title}">` : '<div class="news-card-image-placeholder"></div>'}
+        ${news.image ? `<img src="${news.image}" alt="${news.title}" loading="lazy">` : '<div class="news-card-image-placeholder"></div>'}
       </div>
       <div class="news-card-body">
-        ${news.category ? `<p class="news-card-category">${news.category}</p>` : ''}
-        <h3 class="news-card-title">${news.title}</h3>
-        <p class="news-card-description">${news.description}</p>
-        <p class="news-card-cta"><a class="button" href="${href}">${config.ctaLabel}</a></p>
+        ${news.category ? `<span class="news-card-category">${news.category}</span>` : ''}
+        <p class="news-card-title">${news.title}</p>
+        ${news.description ? `<p class="news-card-description">${news.description}</p>` : ''}
+        ${ago ? `<span class="news-card-meta">${ago}</span>` : ''}
       </div>
     `;
+    // Link wraps the whole card
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => { window.location.href = href; });
     container.append(card);
   });
 }

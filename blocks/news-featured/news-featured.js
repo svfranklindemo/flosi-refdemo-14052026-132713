@@ -176,10 +176,13 @@ function timeAgo(dateStr) {
   if (!dateStr) return '';
   const diff = Date.now() - Date.parse(dateStr);
   if (Number.isNaN(diff) || diff < 0) return '';
-  const h = Math.floor(diff / 3600000);
-  if (h < 1) return 'Agora';
-  if (h < 24) return `Há ${h} h`;
-  return `Há ${Math.floor(h / 24)} d`;
+  const min = Math.floor(diff / 60000);
+  if (min < 1) return 'Ahora';
+  if (min < 60) return `Hace ${min} min`;
+  const h = Math.floor(min / 60);
+  if (h < 24) return `Hace ${h} h`;
+  const d = Math.floor(h / 24);
+  return `Hace ${d} día${d !== 1 ? 's' : ''}`;
 }
 
 // ── DOM builders ──────────────────────────────────────────────────────────────

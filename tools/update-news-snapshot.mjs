@@ -124,10 +124,21 @@ async function run() {
     throw new Error(`Failed to fetch news snapshot: ${response.status}`);
   }
 
+  // Helper: read calendarMetadata from GraphQL _metadata
+  const calMeta = (item, name) => {
+    const entries = Array.isArray(item?._metadata?.calendarMetadata)
+      ? item._metadata.calendarMetadata : [];
+    return entries.find((e) => e?.name === name)?.value || null;
+  };
+
   const payload = await response.json();
   const rawItems = payload?.data?.newsList?.items || [];
   const items = await Promise.all(rawItems.map(async (item) => {
     const masterData = await resolveMasterData(origin, item);
+    // Prefer dates from GraphQL _metadata (more reliable than master.json)
+    const publishedAt = calMeta(item, 'cq:lastPublished') || masterData.publishedAt || null;
+    const createdAt   = calMeta(item, 'jcr:created')      || masterData.createdAt   || null;
+    const updatedAt   = calMeta(item, 'cq:lastModified')   || masterData.updatedAt   || null;
     return {
       _path: item._path || '',
       title: item.title || '',
@@ -138,9 +149,9 @@ async function run() {
       },
       media: masterData.media,
       content: masterData.content || '',
-      createdAt: masterData.createdAt,
-      updatedAt: masterData.updatedAt,
-      publishedAt: masterData.publishedAt,
+      createdAt,
+      updatedAt,
+      publishedAt,
       authorName: masterData.authorName,
       updatedBy: masterData.updatedBy,
     };

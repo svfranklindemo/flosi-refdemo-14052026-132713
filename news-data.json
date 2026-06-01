@@ -7,7 +7,8 @@
       "description": {
         "plaintext": "Pesquisadores anunciam que sistemas de inteligência artificial já superam médicos especialistas na detecção precoce de câncer e doenças cardíacas, marcando uma virada histórica na medicina moderna."
       },
-      "media": null
+      "media": null,
+      "createdAt": null
     },
     {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/news-1",
@@ -16,7 +17,8 @@
       "description": {
         "plaintext": "News 1 Description"
       },
-      "media": "https://publish-p165802-e1765367.adobeaemcloud.com/content/dam/6a05cdafe815815bf04d6032/Firefly_Student studying at a coffee shop with laptop and notebooks, warm daylight, inspirati 905913 (1).jpg"
+      "media": "https://publish-p165802-e1765367.adobeaemcloud.com/content/dam/6a05cdafe815815bf04d6032/Firefly_Student studying at a coffee shop with laptop and notebooks, warm daylight, inspirati 905913 (1).jpg",
+      "createdAt": null
     },
     {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/news-2",
@@ -25,7 +27,8 @@
       "description": {
         "plaintext": "News 2"
       },
-      "media": "https://publish-p165802-e1765367.adobeaemcloud.com/content/dam/6a05cdafe815815bf04d6032/Firefly_Restaurante.jpeg"
+      "media": "https://publish-p165802-e1765367.adobeaemcloud.com/content/dam/6a05cdafe815815bf04d6032/Firefly_Restaurante.jpeg",
+      "createdAt": null
     }
   ]
 }

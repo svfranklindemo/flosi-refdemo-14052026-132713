@@ -6235,16 +6235,5 @@
         "label": "Video Url"
       }
     ]
-  },
-  {
-    "id": "ticker",
-    "fields": [
-      {
-        "component": "richtext",
-        "name": "text",
-        "label": "Manchetes (uma por linha como lista)",
-        "valueType": "string"
-      }
-    ]
   }
 ]

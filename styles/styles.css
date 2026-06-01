@@ -22,22 +22,16 @@
 */
 
 :root {
-  /* Meganoticias brand colors */
-  --color-brand-primary: #085041;
-  --color-brand-secondary: #0F6E56;
-  --color-brand-accent: #1D9E75;
-  --color-brand-live: #D85A30;
-
   /* colors */
   --background-color: var(--brand-background-color, #ffffff);
-  --dark-color: var(--brand-dark-color, #1a1a1a);
-  --light-color: var(--brand-light-color, #f5f5f0);
-  --text-color: var(--brand-text-color, #1a1a1a);
+  --dark-color: var(--brand-dark-color, #131313);
+  --light-color: var(--brand-light-color, #dcdcdc);
+  --text-color: var(--brand-text-color, #131313);
   --text-light: var(--brand-light-text-color, #ffffff);
-  --text-disabled: rgb(113, 113, 113);
-  --link-color: var(--brand-link-color, #085041);
-  --link-hover-color: var(--brand-link-hover-color, #0F6E56);
-  --main-accent-color: var(--brand-theme-color, #1D9E75);
+  --text-disabled:rgb(113, 113, 113);
+  --link-color: var(--brand-link-color, #131313);
+  --link-hover-color: var(--brand-link-hover-color, #0fb89a);
+  --main-accent-color: var(--brand-theme-color, #12d8b1);
 
 
   --dark-color-opacity: rgba(0, 0, 0, 0.55);

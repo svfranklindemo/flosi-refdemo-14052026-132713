@@ -70,13 +70,32 @@ async function resolveMasterData(origin, item) {
     const mediaPath = typeof master?.media === 'string' ? master.media : null;
     const content = master?.content?.html || master?.content?.plaintext || master?.content || '';
     const dates = parseCreatedAt(master);
-    // category from master.json (publish) as fallback
     const category = typeof master?.category === 'string' ? master.category : null;
+
+    // Fetch asset node JSON to get cq:lastPublished (not in data/master.json)
+    let publishedAt = dates.publishedAt;
+    if (!publishedAt) {
+      try {
+        const assetRes = await fetch(`${origin}${item._path}.json`, {
+          headers: { 'Cache-Control': 'no-cache', Pragma: 'no-cache' },
+        });
+        if (assetRes.ok) {
+          const asset = await assetRes.json();
+          const jcrContent = asset?.['jcr:content'] || {};
+          publishedAt = jcrContent?.['cq:lastPublished']
+            || jcrContent?.['cq:lastReplicated']
+            || asset?.['cq:lastPublished']
+            || null;
+        }
+      } catch (_) { /* ignore */ }
+    }
+
     return {
       media: mediaPath ? `${origin}${mediaPath}` : initialMedia,
       content,
       category,
       ...dates,
+      publishedAt,
     };
   } catch (_) {
     return {

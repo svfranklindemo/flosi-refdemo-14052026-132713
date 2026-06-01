@@ -101,25 +101,37 @@ function resolveNewsLink(slug, detailBasePath) {
   if (/^https?:\/\//i.test(slug)) return slug;
   if (slug.startsWith('/')) return slug;
   const cleanSlug = slug.replace(/^\//, '');
+  const rawBase = (detailBasePath || '/news').trim();
+
+  const withSlugQuery = (baseUrl) => {
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    return `${baseUrl}${separator}slug=${encodeURIComponent(cleanSlug)}`;
+  };
+
   if (isAuthorRuntime()) {
     const current = window.location.pathname;
     const pagePath = current.replace(/\/+$/, '');
     const parent = pagePath.substring(0, pagePath.lastIndexOf('/') + 1);
-    const detailSegments = (detailBasePath || '/news').replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+    const detailSegments = rawBase.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
     const detailName = detailSegments[detailSegments.length - 1] || 'news';
-    return `${parent}${detailName}.html?slug=${encodeURIComponent(cleanSlug)}`;
+    if (rawBase.includes('.html') || rawBase.startsWith('/content/')) {
+      return withSlugQuery(rawBase);
+    }
+    return withSlugQuery(`${parent}${detailName}.html`);
   }
-  const current = window.location.pathname.replace(/\/+$/, '');
-  const parent = current.substring(0, current.lastIndexOf('/')) || '';
-  const rawBase = (detailBasePath || '/news').trim();
-  const baseSegments = rawBase.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
-  let finalBase = rawBase.replace(/\/+$/g, '');
-  if (rawBase.startsWith('/') && baseSegments.length === 1) {
-    finalBase = `${parent}/${baseSegments[0]}`;
-  } else if (!rawBase.startsWith('/')) {
-    finalBase = `${parent}/${rawBase.replace(/^\/+|\/+$/g, '')}`;
+
+  const currentPath = window.location.pathname.replace(/\/+$/, '');
+  const localeSegment = currentPath.split('/').filter(Boolean)[0] || '';
+  let finalBase = rawBase.replace(/\/+$/g, '') || '/news';
+  const baseSegments = finalBase.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+
+  if (finalBase.startsWith('/') && baseSegments.length === 1 && localeSegment) {
+    finalBase = `/${localeSegment}/${baseSegments[0]}`;
+  } else if (!finalBase.startsWith('/')) {
+    finalBase = `/${localeSegment}/${finalBase}`.replace(/\/{2,}/g, '/');
   }
-  return `${finalBase}/${cleanSlug}`;
+
+  return withSlugQuery(finalBase);
 }
 
 function renderNews(items, config, container) {

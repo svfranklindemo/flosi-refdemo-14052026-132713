@@ -71,8 +71,10 @@ function getSlugFromPath(detailBasePath) {
   if (fromQuery) return decodeURIComponent(fromQuery.trim());
   const base = normalizePath(detailBasePath || '/news');
   const current = normalizePath(window.location.pathname);
-  if (!current.startsWith(base)) return '';
-  const remainder = current.slice(base.length).replace(/^\/+/, '');
+  let startIndex = current.indexOf(`${base}/`);
+  if (startIndex < 0 && current.startsWith(base)) startIndex = 0;
+  if (startIndex < 0) return '';
+  const remainder = current.slice(startIndex + base.length).replace(/^\/+/, '');
   return decodeURIComponent((remainder.split('/')[0] || '').trim());
 }
 

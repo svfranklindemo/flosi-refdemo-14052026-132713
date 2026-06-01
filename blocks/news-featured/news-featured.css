@@ -1,5 +1,9 @@
 /* Section header styles moved to styles.css as .block-news-header */
 
+.news-featured {
+  margin-top: 32px;
+}
+
 /* ── Grid: big card left, narrow stack right ─── */
 .news-featured .nf-grid {
   display: grid;

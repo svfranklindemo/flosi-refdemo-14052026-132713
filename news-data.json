@@ -1,6 +1,15 @@
 {
   "items": [
     {
+      "_path": "/content/dam/6a05cdafe815815bf04d6032/ia-revoluciona-medicina-2026",
+      "title": "IA Revoluciona o Diagnóstico Médico e Salva Milhares de Vidas em 2026",
+      "slug": "ia-revoluciona-diagnostico-medico-2026",
+      "description": {
+        "plaintext": "Pesquisadores anunciam que sistemas de inteligência artificial já superam médicos especialistas na detecção precoce de câncer e doenças cardíacas, marcando uma virada histórica na medicina moderna."
+      },
+      "media": null
+    },
+    {
       "_path": "/content/dam/6a05cdafe815815bf04d6032/news-1",
       "title": "News 1 Title",
       "slug": "news-1-slug",

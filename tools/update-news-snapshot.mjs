@@ -159,8 +159,8 @@ async function run() {
 
   // Sort by publishedAt (cq:lastPublished) — newest first
   items.sort((a, b) => {
-    const aTime = Date.parse(a.publishedAt || a.createdAt || '') || 0;
-    const bTime = Date.parse(b.publishedAt || b.createdAt || '') || 0;
+    const aTime = Date.parse(a.publishedAt || a.updatedAt || a.createdAt || '') || 0;
+    const bTime = Date.parse(b.publishedAt || b.updatedAt || b.createdAt || '') || 0;
     return bTime - aTime;
   });
 

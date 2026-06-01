@@ -85,7 +85,7 @@ function extractNewsFromGraphql(item) {
   if (!title) return null;
   // Try _metadata.calendarMetadata first (from updated query), fallback to direct fields
   const createdAt = calendarMeta(item, 'cq:lastPublished')
-    || String(item.publishedAt || item.createdAt || item.updatedAt || item._createdAt || '').trim();
+    || String(item.updatedAt || item.publishedAt || item.createdAt || item._createdAt || '').trim();
   return {
     id: item._path || item._id || title,
     title,

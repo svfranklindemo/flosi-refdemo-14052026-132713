@@ -663,39 +663,6 @@ main > .section:first-of-type {
   }
 }
 
-/* Megamedia Editorial Theme - Phase 1 */
-:root {
-  --news-primary: #e30023;
-  --news-primary-dark: #b7001c;
-  --news-text: #111827;
-  --news-muted: #4b5563;
-  --news-border: #d9dee7;
-  --news-bg: #f3f5f8;
-  --news-card: #ffffff;
-}
-
-body {
-  background: var(--news-bg);
-  color: var(--news-text);
-}
-
-main .section {
-  border-top: 1px solid transparent;
-}
-
-h1, h2, h3, h4 {
-  color: #0f172a;
-  letter-spacing: -0.01em;
-}
-
-a:any-link {
-  color: #0f172a;
-}
-
-a:any-link:hover {
-  color: var(--news-primary);
-}
-
 /* section metadata */
 main .section.light,
 main .section.highlight {

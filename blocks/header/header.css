@@ -10,21 +10,15 @@ header .nav-wrapper {
 
 header nav {
   box-sizing: border-box;
-  display: grid;
-  grid-template:
-    'hamburger brand tools' var(--nav-height)
-    'sections sections sections' 1fr / auto 1fr auto;
+  display: flex;
   align-items: center;
   gap: 0 24px;
   margin: auto;
   max-width: 1248px;
-  height: var(--nav-height);
+  height: 64px;
   padding: 0 24px;
   font-family: var(--body-font-family);
   position: relative;
-  min-height: 90px;
-  align-items: center;
-  display: flex;
 }
 
 header nav[aria-expanded='true'] {
@@ -162,10 +156,13 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
 /* brand */
 header .nav-brand {
   grid-area: brand;
-  flex-basis: 128px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
   font-size: var(--heading-font-size-s);
   font-weight: 700;
   line-height: 1;
+  margin-right: 32px;
 }
 
 .wehealthcare-theme header .nav-brand {

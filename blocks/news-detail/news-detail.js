@@ -136,11 +136,11 @@ export default async function decorate(block) {
       case 'persistedquery':
         persistedQueryPath = value;
         break;
-      case 'graphqlendpoint':
-      case 'graphqlhost':
       case 'authorgraphqlendpoint':
         authorGraphqlEndpoint = value;
         break;
+      case 'graphqlendpoint':
+      case 'graphqlhost':
       case 'edgegraphqlendpoint':
       case 'publishgraphqlendpoint':
         edgeGraphqlEndpoint = value;

@@ -118,12 +118,58 @@ async function fetchByPathsFromJson(cfPaths, edgeDataPath) {
 }
 
 // ── Resolve link igual ao news-feed ───────────────────────────────────────────
+// Mesma lógica do news-feed para resolver links em author e edge
 function resolveLink(slug, detailBasePath) {
   if (!slug) return '#';
   if (/^https?:\/\//i.test(slug)) return slug;
-  const base = (detailBasePath || '/en/news').trim().replace(/\/+$/, '');
-  const sep = base.includes('?') ? '&' : '?';
-  return `${base}${sep}slug=${encodeURIComponent(slug)}`;
+  if (slug.startsWith('/')) return slug;
+  const cleanSlug = slug.replace(/^\//, '');
+  const rawBase = (detailBasePath || '/en/news').trim();
+
+  const withSlugQuery = (baseUrl) => {
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    return `${baseUrl}${separator}slug=${encodeURIComponent(cleanSlug)}`;
+  };
+
+  if (isAuthorRuntime()) {
+    const current = window.location.pathname;
+    const pagePath = current.replace(/\/+$/, '');
+    const pageName = pagePath.split('/').pop() || '';
+    const pageNameNoExt = pageName.replace(/\.html$/i, '');
+    const parent = pagePath.substring(0, pagePath.lastIndexOf('/') + 1);
+    const detailSegments = rawBase.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+    const detailName = detailSegments[detailSegments.length - 1] || 'news';
+    if (rawBase.includes('.html') || rawBase.startsWith('/content/')) {
+      return withSlugQuery(rawBase);
+    }
+    if (!parent.endsWith(`/${pageNameNoExt}/`) && /^[a-z]{2}(?:-[a-z]{2})?$/i.test(pageNameNoExt)) {
+      return withSlugQuery(`${parent}${pageNameNoExt}/${detailName}.html`);
+    }
+    return withSlugQuery(`${parent}${detailName}.html`);
+  }
+
+  // Edge runtime
+  const currentPath = window.location.pathname.replace(/\/+$/, '');
+  const pathSegments = currentPath.split('/').filter(Boolean);
+  const firstSeg = pathSegments[0] || '';
+  const htmlLang = (document?.documentElement?.lang || '').toLowerCase().trim();
+  const langFallback = htmlLang.split('-')[0] || '';
+  const localeSegment = /^[a-z]{2}(?:-[a-z]{2})?$/i.test(firstSeg)
+    ? firstSeg
+    : (langFallback.match(/^[a-z]{2}$/i)?.[0] || '');
+  let finalBase = rawBase.replace(/\/+$/g, '') || '/news';
+  if (finalBase.startsWith('/content/')) {
+    const name = finalBase.split('/').filter(Boolean).pop()?.replace(/\.html$/i, '') || 'news';
+    finalBase = localeSegment ? `/${localeSegment}/${name}` : `/${name}`;
+  }
+  finalBase = finalBase.replace(/\.html$/i, '');
+  const baseSegments = finalBase.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+  if (finalBase.startsWith('/') && baseSegments.length === 1 && localeSegment) {
+    finalBase = `/${localeSegment}/${baseSegments[0]}`;
+  } else if (!finalBase.startsWith('/')) {
+    finalBase = `/${localeSegment}/${finalBase}`.replace(/\/{2,}/g, '/');
+  }
+  return withSlugQuery(finalBase);
 }
 
 function timeAgo(dateStr) {

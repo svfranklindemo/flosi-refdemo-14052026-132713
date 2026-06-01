@@ -263,26 +263,59 @@ function renderNewsDetail(block, item) {
     ? ` data-aue-resource="urn:aemconnection:${item.id}/jcr:content/data/master" data-aue-type="reference" data-aue-label="Content Fragment"`
     : '';
 
+  // Author initials avatar
+  const initials = authorName
+    ? authorName.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()
+    : '?';
+
+  // Breadcrumb
+  const titleShort = item.title.length > 60 ? `${item.title.substring(0, 57)}…` : item.title;
+  const breadcrumb = `
+    <nav class="news-detail-breadcrumb" aria-label="breadcrumb">
+      <a href="/" class="nd-bc-item">Portada</a>
+      <span class="nd-bc-sep">›</span>
+      ${item.category ? `<span class="nd-bc-item">${item.category}</span><span class="nd-bc-sep">›</span>` : ''}
+      <span class="nd-bc-current">${titleShort}</span>
+    </nav>
+  `;
+
+  const pageUrl = encodeURIComponent(window.location.href);
+  const pageTitle = encodeURIComponent(item.title);
+
   block.innerHTML = `
+    ${breadcrumb}
     <article class="news-detail-article"${referenceAue}>
       ${item.category ? `<p class="news-detail-category"${buildAueAttrs(item.id, 'category')}>${item.category}</p>` : ''}
       <h1 class="news-detail-title"${buildAueAttrs(item.id, 'title')}>${item.title}</h1>
+      ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}
+
       <div class="news-detail-meta-row">
+        ${authorName ? `
+        <div class="news-detail-author">
+          <div class="nd-author-avatar">${initials}</div>
+          <div>
+            <div class="nd-author-name">${authorName}</div>
+          </div>
+        </div>
+        <div class="nd-meta-divider"></div>
+        ` : ''}
         <div class="news-detail-meta">
-          <span class="news-detail-meta-item news-detail-author">Por ${authorName}</span>
-          ${created ? `<span class="news-detail-meta-item">Publicado: ${created}</span>` : ''}
-          ${showUpdated ? `<span class="news-detail-meta-item">Atualizado: ${updated}</span>` : ''}
-          ${showUpdated && updatedAgo ? `<span class="news-detail-meta-item">(${updatedAgo})</span>` : ''}
+          ${created ? `<span class="news-detail-meta-item">${created}</span>` : ''}
+          ${showUpdated && updatedAgo ? `<span class="news-detail-meta-item">Actualizado ${updatedAgo}</span>` : ''}
+        </div>
+        <div class="news-detail-share" aria-label="Compartir">
+          <span class="news-detail-share-label">Compartir</span>
+          <a class="news-detail-share-link" href="https://twitter.com/intent/tweet?url=${pageUrl}&text=${pageTitle}" target="_blank" rel="noopener" title="Twitter/X">𝕏</a>
+          <a class="news-detail-share-link" href="https://api.whatsapp.com/send?text=${pageTitle}%20${pageUrl}" target="_blank" rel="noopener" title="WhatsApp">W</a>
+          <a class="news-detail-share-link" href="https://www.facebook.com/sharer/sharer.php?u=${pageUrl}" target="_blank" rel="noopener" title="Facebook">f</a>
         </div>
       </div>
-      <div class="news-detail-share" aria-label="Compartilhar">
-        <span class="news-detail-share-label">Compartilhar:</span>
-        <a class="news-detail-share-link news-detail-share-x" href="${buildShareUrl('x', item.title)}" target="_blank" rel="noopener">X</a>
-        <a class="news-detail-share-link news-detail-share-facebook" href="${buildShareUrl('facebook', item.title)}" target="_blank" rel="noopener">Facebook</a>
-        <a class="news-detail-share-link news-detail-share-linkedin" href="${buildShareUrl('linkedin', item.title)}" target="_blank" rel="noopener">LinkedIn</a>
-      </div>
-      ${item.image ? `<p class="news-detail-image"><img src="${item.image}" alt="${item.title}"></p>` : ''}
-      ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}
+
+      ${item.image ? `
+        <div class="news-detail-image">
+          <img src="${item.image}" alt="${item.title}">
+        </div>
+      ` : ''}
       ${item.content ? `<div class="news-detail-content"${buildAueAttrs(item.id, 'content')}>${item.content}</div>` : ''}
     </article>
   `;

@@ -6260,31 +6260,61 @@
     "fields": [
       {
         "component": "text",
+        "name": "title",
+        "label": "Título da seção",
+        "valueType": "string",
+        "value": "Noticias destacadas"
+      },
+      {
+        "component": "aem-content",
+        "name": "cf1",
+        "label": "Notícia destaque (card grande)",
+        "valueType": "string"
+      },
+      {
+        "component": "aem-content",
+        "name": "cf2",
+        "label": "Notícia lateral 1",
+        "valueType": "string"
+      },
+      {
+        "component": "aem-content",
+        "name": "cf3",
+        "label": "Notícia lateral 2",
+        "valueType": "string"
+      },
+      {
+        "component": "aem-content",
+        "name": "cf4",
+        "label": "Notícia lateral 3",
+        "valueType": "string"
+      },
+      {
+        "component": "text",
         "name": "edgedatapath",
-        "label": "Caminho do JSON de notícias",
+        "label": "Fallback JSON (edge)",
         "valueType": "string",
         "value": "/news-data.json"
       },
       {
         "component": "text",
         "name": "detailbasepath",
-        "label": "Caminho da página de detalhe",
+        "label": "Página de detalhe",
         "valueType": "string",
         "value": "/en/news"
       },
       {
         "component": "text",
-        "name": "maxitems",
-        "label": "Número de notícias (recomendado: 4)",
-        "valueType": "string",
-        "value": "4"
+        "name": "authorgraphqlendpoint",
+        "label": "GraphQL endpoint (author)",
+        "valueType": "string"
       },
       {
         "component": "text",
-        "name": "title",
-        "label": "Título da seção",
+        "name": "persistedquerypath",
+        "label": "Persisted query",
         "valueType": "string",
-        "value": "Noticias destacadas"
+        "value": "ref-demo-eds/news-by-folder"
       }
     ]
   }

@@ -44,6 +44,14 @@ function readConfigText(div) {
   return (paragraph?.textContent || div?.textContent || '').trim();
 }
 
+function normalizeCtaStyle(value) {
+  const v = (value || '').trim();
+  if (v === 'button') return 'cta-button';
+  if (v === 'button-secondary') return 'cta-button-secondary';
+  if (v === 'button-dark') return 'cta-button-dark';
+  return v || 'cta-button';
+}
+
 export default function decorate(block) {
   const ul = document.createElement('ul');
   [...block.children].forEach((row) => {
@@ -107,6 +115,12 @@ export default function decorate(block) {
       // First div (index 0) - Image
       if (index === 0) {
         div.className = 'cards-card-image';
+        if (tagLabel) {
+          const tag = document.createElement('span');
+          tag.className = `cards-card-tag tag-${li.dataset.cardTagType || ''}`.trim();
+          tag.textContent = tagLabel;
+          div.append(tag);
+        }
       }
       // Second div (index 1) - Content with button
       else if (index === 1) {
@@ -125,10 +139,20 @@ export default function decorate(block) {
     // Apply CTA styles to button containers
     const buttonContainers = li.querySelectorAll('p.button-container');
     buttonContainers.forEach(buttonContainer => {
+      const normalizedCtaStyle = normalizeCtaStyle(ctaStyle);
       // Remove any existing CTA classes
-      buttonContainer.classList.remove('default', 'cta-button', 'cta-button-secondary', 'cta-button-dark', 'cta-default');
+      buttonContainer.classList.remove(
+        'default',
+        'button',
+        'button-secondary',
+        'button-dark',
+        'cta-button',
+        'cta-button-secondary',
+        'cta-button-dark',
+        'cta-default',
+      );
       // Add the correct CTA class
-      buttonContainer.classList.add(ctaStyle);
+      buttonContainer.classList.add(normalizedCtaStyle);
     });
     
     ul.append(li);

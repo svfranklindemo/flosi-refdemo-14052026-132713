@@ -112,8 +112,7 @@
   display: block;
 }
 
-.cards > ul > li[data-card-tag] .cards-card-image::after {
-  content: attr(data-card-tag);
+.cards .cards-card-image .cards-card-tag {
   position: absolute;
   left: 0;
   right: 0;
@@ -136,23 +135,23 @@
   pointer-events: none;
 }
 
-.cards > ul > li[data-card-tag-type="exclusivo"] .cards-card-image::after {
+.cards .cards-card-image .cards-card-tag.tag-exclusivo {
   background: #e30023;
 }
 
-.cards > ul > li[data-card-tag-type="mega-investiga"] .cards-card-image::after {
+.cards .cards-card-image .cards-card-tag.tag-mega-investiga {
   background: #1ea98c;
 }
 
-.cards > ul > li[data-card-tag-type="radio-infinita"] .cards-card-image::after {
+.cards .cards-card-image .cards-card-tag.tag-radio-infinita {
   background: #1ea98c;
 }
 
-.cards > ul > li[data-card-tag-type="ultimo-minuto"] .cards-card-image::after {
+.cards .cards-card-image .cards-card-tag.tag-ultimo-minuto {
   background: #f05a24;
 }
 
-.cards > ul > li[data-card-tag-type="analise"] .cards-card-image::after {
+.cards .cards-card-image .cards-card-tag.tag-analisis {
   background: #0083ca;
 }
 .cards > ul > li .cards-card-body {

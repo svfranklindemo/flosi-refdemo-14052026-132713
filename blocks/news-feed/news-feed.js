@@ -73,10 +73,19 @@ function extractGraphqlItems(payload) {
   return Array.isArray(data[key]?.items) ? data[key].items : [];
 }
 
+function calendarMeta(item, name) {
+  const entries = Array.isArray(item?._metadata?.calendarMetadata)
+    ? item._metadata.calendarMetadata : [];
+  return entries.find((e) => e?.name === name)?.value || '';
+}
+
 function extractNewsFromGraphql(item) {
   if (!item || typeof item !== 'object') return null;
   const title = String(item.title || '').trim();
   if (!title) return null;
+  // Try _metadata.calendarMetadata first (from updated query), fallback to direct fields
+  const createdAt = calendarMeta(item, 'jcr:created')
+    || String(item.createdAt || item.publishedAt || item.updatedAt || item._createdAt || '').trim();
   return {
     id: item._path || item._id || title,
     title,
@@ -84,7 +93,7 @@ function extractNewsFromGraphql(item) {
     category: readFieldValue(item.category) || '',
     slug: String(item.slug || '').trim(),
     image: readFieldValue(item.media) || '',
-    createdAt: String(item.createdAt || item.publishedAt || item.updatedAt || item._createdAt || '').trim(),
+    createdAt,
   };
 }
 

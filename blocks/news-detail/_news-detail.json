@@ -58,6 +58,20 @@
           "name": "manualNewsPaths",
           "label": "Manual News Paths (one per line, optional)",
           "value": ""
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "persistedQueryPath",
+          "label": "Persisted Query Path",
+          "value": "ref-demo-eds/news-by-folder"
+        },
+        {
+          "component": "text",
+          "valueType": "string",
+          "name": "graphqlEndpoint",
+          "label": "GraphQL Endpoint Base (optional)",
+          "value": ""
         }
       ]
     }

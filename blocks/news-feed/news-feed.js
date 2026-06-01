@@ -1,4 +1,4 @@
-const DEBUG_VERSION = 'news-feed-clean-v2';
+const DEBUG_VERSION = 'news-feed-graphql-v1';
 
 function createElement(tag, className, html) {
   const element = document.createElement(tag);
@@ -36,6 +36,18 @@ function parseManualPaths(raw) {
     .filter((item) => item.startsWith('/content/dam/'));
 }
 
+function buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath) {
+  const persisted = String(persistedQueryPath || '').trim().replace(/^\/+/, '');
+  if (!persisted) return '';
+  const folder = normalizeFolderPath(folderPath);
+  const base = String(graphqlEndpoint || '').trim().replace(/\/+$/g, '');
+  if (base.includes('/graphql/execute.json')) {
+    return `${base}/${persisted};path=${encodeURIComponent(folder)}`;
+  }
+  const prefix = base ? `${base}` : '';
+  return `${prefix}/graphql/execute.json/${persisted};path=${encodeURIComponent(folder)}`;
+}
+
 function readFieldValue(field) {
   if (field === null || field === undefined) return '';
   if (typeof field === 'string') return field;
@@ -44,6 +56,14 @@ function readFieldValue(field) {
     return field.value || field.plaintext || field.html || field.path || field._path || '';
   }
   return '';
+}
+
+function extractGraphqlItems(payload) {
+  const data = payload?.data;
+  if (!data || typeof data !== 'object') return [];
+  const key = Object.keys(data).find((k) => k.endsWith('List') || k.endsWith('Paginated'));
+  if (!key) return [];
+  return Array.isArray(data[key]?.items) ? data[key].items : [];
 }
 
 async function fetchJsonWithStatus(urls) {
@@ -106,6 +126,20 @@ function extractNewsFromMaster(masterJson, path) {
     category: readFieldValue(masterJson.category) || '',
     slug: String(masterJson.slug || '').trim(),
     image: readFieldValue(masterJson.media) || '',
+  };
+}
+
+function extractNewsFromGraphql(item) {
+  if (!item || typeof item !== 'object') return null;
+  const title = String(item.title || '').trim();
+  if (!title) return null;
+  return {
+    id: item._path || item._id || title,
+    title,
+    description: readFieldValue(item.description) || '',
+    category: readFieldValue(item.category) || '',
+    slug: String(item.slug || '').trim(),
+    image: readFieldValue(item.media) || '',
   };
 }
 
@@ -198,6 +232,34 @@ async function fetchNewsFromFolder(folderPath) {
   };
 }
 
+async function fetchNewsFromPersistedQuery(folderPath, graphqlEndpoint, persistedQueryPath) {
+  const normalized = normalizeFolderPath(folderPath);
+  const gqlUrl = buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, normalized);
+  if (!gqlUrl) {
+    return { items: [], debug: { source: 'graphql-missing-config', gqlUrl: '', gqlStatus: 'not-configured' } };
+  }
+
+  const response = await fetch(gqlUrl);
+  if (!response.ok) {
+    return {
+      items: [],
+      debug: { source: 'graphql', gqlUrl, gqlStatus: response.status },
+    };
+  }
+
+  const payload = await response.json();
+  const items = extractGraphqlItems(payload).map(extractNewsFromGraphql).filter(Boolean);
+  return {
+    items,
+    debug: {
+      source: 'graphql',
+      gqlUrl,
+      gqlStatus: response.status,
+      gqlCount: items.length,
+    },
+  };
+}
+
 export default async function decorate(block) {
   let title = 'Últimas Notícias';
   let subtitle = 'Confira as notícias mais recentes';
@@ -207,6 +269,8 @@ export default async function decorate(block) {
   let detailBasePath = '/news';
   let emptyStateText = 'Nenhuma notícia encontrada.';
   let manualNewsPaths = '';
+  let persistedQueryPath = 'ref-demo-eds/news-by-folder';
+  let graphqlEndpoint = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -227,6 +291,14 @@ export default async function decorate(block) {
       case 'manualnewspathsoneperlineoptional':
       case 'manualnewspathscommaseparatedoptional':
         manualNewsPaths = value;
+        break;
+      case 'persistedquerypath':
+      case 'persistedquery':
+        persistedQueryPath = value;
+        break;
+      case 'graphqlendpoint':
+      case 'graphqlhost':
+        graphqlEndpoint = value;
         break;
       default: break;
     }
@@ -252,7 +324,24 @@ export default async function decorate(block) {
     const manualPaths = parseManualPaths(manualNewsPaths);
     let items = [];
     let debug = null;
-    if (manualPaths.length) {
+    const gqlResult = await fetchNewsFromPersistedQuery(contentFragmentFolder, graphqlEndpoint, persistedQueryPath);
+    if (gqlResult.items.length) {
+      items = gqlResult.items;
+      debug = {
+        folder: normalizeFolderPath(contentFragmentFolder),
+        children: gqlResult.items.length,
+        qbStatus: 'n/a',
+        qbTotal: gqlResult.items.length,
+        qbSample: gqlResult.items.slice(0, 3).map((x) => x.id).join(','),
+        qbUrl: 'n/a',
+        cfFetch: 'n/a',
+        manualCount: manualPaths.length,
+        manualSample: manualPaths.slice(0, 3).join(','),
+        source: gqlResult.debug.source,
+        gqlStatus: gqlResult.debug.gqlStatus,
+        gqlUrl: gqlResult.debug.gqlUrl,
+      };
+    } else if (manualPaths.length) {
       const result = await fetchNewsFromPaths(manualPaths);
       items = result.items;
       debug = {
@@ -265,18 +354,24 @@ export default async function decorate(block) {
         cfFetch: result.cfFetchDebug.slice(0, 4).join(' | '),
         manualCount: manualPaths.length,
         manualSample: manualPaths.slice(0, 3).join(','),
+        source: 'manual',
+        gqlStatus: gqlResult.debug.gqlStatus,
+        gqlUrl: gqlResult.debug.gqlUrl,
       };
     } else {
       ({ items, debug } = await fetchNewsFromFolder(contentFragmentFolder));
       debug.manualCount = 0;
       debug.manualSample = '';
+      debug.source = 'querybuilder';
+      debug.gqlStatus = gqlResult.debug.gqlStatus;
+      debug.gqlUrl = gqlResult.debug.gqlUrl;
     }
     renderNews(items.slice(0, maxItems), { ctaLabel, detailBasePath, emptyStateText }, list);
     if (!items.length) {
       const info = createElement(
         'p',
         'news-feed-error',
-        `Debug: folder=${debug.folder} | children=${debug.children} | qbStatus=${debug.qbStatus} | qbTotal=${debug.qbTotal} | qbSample=${debug.qbSample} | manualCount=${debug.manualCount} | manualSample=${debug.manualSample} | cfFetch=${debug.cfFetch} | qbUrl=${debug.qbUrl} | debugVersion=${DEBUG_VERSION}`,
+        `Debug: folder=${debug.folder} | children=${debug.children} | source=${debug.source} | gqlStatus=${debug.gqlStatus} | gqlUrl=${debug.gqlUrl} | qbStatus=${debug.qbStatus} | qbTotal=${debug.qbTotal} | qbSample=${debug.qbSample} | manualCount=${debug.manualCount} | manualSample=${debug.manualSample} | cfFetch=${debug.cfFetch} | qbUrl=${debug.qbUrl} | debugVersion=${DEBUG_VERSION}`,
       );
       list.append(info);
     }

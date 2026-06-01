@@ -26,12 +26,32 @@ function parseManualPaths(raw) {
     .filter((item) => item.startsWith('/content/dam/'));
 }
 
+function buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath) {
+  const persisted = String(persistedQueryPath || '').trim().replace(/^\/+/, '');
+  if (!persisted) return '';
+  const folder = normalizePath(folderPath);
+  const base = String(graphqlEndpoint || '').trim().replace(/\/+$/g, '');
+  if (base.includes('/graphql/execute.json')) {
+    return `${base}/${persisted};path=${encodeURIComponent(folder)}`;
+  }
+  const prefix = base ? `${base}` : '';
+  return `${prefix}/graphql/execute.json/${persisted};path=${encodeURIComponent(folder)}`;
+}
+
 function readValue(field) {
   if (field === null || field === undefined) return '';
   if (typeof field === 'string') return field;
   if (typeof field === 'number') return String(field);
   if (typeof field === 'object') return field.value || field.plaintext || field.html || field.path || field._path || '';
   return '';
+}
+
+function extractGraphqlItems(payload) {
+  const data = payload?.data;
+  if (!data || typeof data !== 'object') return [];
+  const key = Object.keys(data).find((k) => k.endsWith('List') || k.endsWith('Paginated'));
+  if (!key) return [];
+  return Array.isArray(data[key]?.items) ? data[key].items : [];
 }
 
 function getSlugFromPath(detailBasePath) {
@@ -86,6 +106,30 @@ function normalizeNews(master, path) {
   };
 }
 
+function normalizeNewsFromGraphql(item) {
+  if (!item || typeof item !== 'object') return null;
+  const title = String(item.title || '').trim();
+  if (!title) return null;
+  return {
+    id: item._path || item._id || title,
+    title,
+    description: readValue(item.description) || '',
+    content: readValue(item.content) || '',
+    category: readValue(item.category) || '',
+    slug: String(item.slug || '').trim(),
+    image: readValue(item.media) || '',
+  };
+}
+
+async function fetchNewsFromPersistedQuery(folderPath, graphqlEndpoint, persistedQueryPath) {
+  const gqlUrl = buildGraphqlUrl(graphqlEndpoint, persistedQueryPath, folderPath);
+  if (!gqlUrl) return [];
+  const response = await fetch(gqlUrl);
+  if (!response.ok) return [];
+  const payload = await response.json();
+  return extractGraphqlItems(payload).map(normalizeNewsFromGraphql).filter(Boolean);
+}
+
 function renderNewsDetail(block, item) {
   block.innerHTML = `
     <article class="news-detail-article">
@@ -104,6 +148,8 @@ export default async function decorate(block) {
   let notFoundText = 'Notícia não encontrada.';
   let missingSlugText = 'Slug da notícia não encontrado na URL.';
   let manualNewsPaths = '';
+  let persistedQueryPath = 'ref-demo-eds/news-by-folder';
+  let graphqlEndpoint = '';
 
   Array.from(block.querySelectorAll(':scope > div')).forEach((row) => {
     const cells = row.querySelectorAll(':scope > div');
@@ -120,6 +166,14 @@ export default async function decorate(block) {
       case 'manualnewspathsoneperlineoptional':
       case 'manualnewspathscommaseparatedoptional':
         manualNewsPaths = value;
+        break;
+      case 'persistedquerypath':
+      case 'persistedquery':
+        persistedQueryPath = value;
+        break;
+      case 'graphqlendpoint':
+      case 'graphqlhost':
+        graphqlEndpoint = value;
         break;
       default: break;
     }
@@ -139,15 +193,17 @@ export default async function decorate(block) {
     return;
   }
 
-  const manualPaths = parseManualPaths(manualNewsPaths);
-  const paths = manualPaths.length
-    ? manualPaths
-    : await fetchAssetsViaQueryBuilder(normalizePath(contentFragmentFolder));
-
-  const masters = await Promise.all(paths.map((path) => fetchMaster(path)));
-  const items = masters
-    .map((master, index) => normalizeNews(master, paths[index]))
-    .filter(Boolean);
+  let items = await fetchNewsFromPersistedQuery(contentFragmentFolder, graphqlEndpoint, persistedQueryPath);
+  if (!items.length) {
+    const manualPaths = parseManualPaths(manualNewsPaths);
+    const paths = manualPaths.length
+      ? manualPaths
+      : await fetchAssetsViaQueryBuilder(normalizePath(contentFragmentFolder));
+    const masters = await Promise.all(paths.map((path) => fetchMaster(path)));
+    items = masters
+      .map((master, index) => normalizeNews(master, paths[index]))
+      .filter(Boolean);
+  }
 
   const current = items.find((item) => item.slug === slug);
   if (!current) {

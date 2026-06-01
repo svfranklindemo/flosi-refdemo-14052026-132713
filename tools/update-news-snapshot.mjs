@@ -8,15 +8,23 @@ function parseCreatedAt(master) {
   const calendars = Array.isArray(master?._metadata?.calendarMetadata)
     ? master._metadata.calendarMetadata
     : [];
-  const created = calendars.find((entry) => entry?.name === 'jcr:created')?.value
-    || calendars.find((entry) => entry?.name === 'cq:lastModified')?.value
-    || '';
-  return created || null;
+  const createdAt = calendars.find((entry) => entry?.name === 'jcr:created')?.value || '';
+  const updatedAt = calendars.find((entry) => entry?.name === 'cq:lastModified')?.value || '';
+  const publishedAt = calendars.find((entry) => entry?.name === 'cq:lastPublished')?.value || '';
+  return { createdAt: createdAt || null, updatedAt: updatedAt || null, publishedAt: publishedAt || null };
 }
 
 async function resolveMasterData(origin, item) {
   const initialMedia = item?.media?._path ? `${origin}${item.media._path}` : null;
-  if (!item?._path) return { media: initialMedia, createdAt: null };
+  if (!item?._path) {
+    return {
+      media: initialMedia,
+      content: '',
+      createdAt: null,
+      updatedAt: null,
+      publishedAt: null,
+    };
+  }
 
   const masterUrl = `${origin}${item._path}/jcr:content/data/master.json`;
   try {
@@ -26,15 +34,32 @@ async function resolveMasterData(origin, item) {
         Pragma: 'no-cache',
       },
     });
-    if (!response.ok) return { media: initialMedia, createdAt: null };
+    if (!response.ok) {
+      return {
+        media: initialMedia,
+        content: '',
+        createdAt: null,
+        updatedAt: null,
+        publishedAt: null,
+      };
+    }
     const master = await response.json();
     const mediaPath = typeof master?.media === 'string' ? master.media : null;
+    const content = master?.content?.html || master?.content?.plaintext || master?.content || '';
+    const dates = parseCreatedAt(master);
     return {
       media: mediaPath ? `${origin}${mediaPath}` : initialMedia,
-      createdAt: parseCreatedAt(master),
+      content,
+      ...dates,
     };
   } catch (_) {
-    return { media: initialMedia, createdAt: null };
+    return {
+      media: initialMedia,
+      content: '',
+      createdAt: null,
+      updatedAt: null,
+      publishedAt: null,
+    };
   }
 }
 
@@ -64,7 +89,10 @@ async function run() {
         plaintext: item?.description?.plaintext || '',
       },
       media: masterData.media,
+      content: masterData.content || '',
       createdAt: masterData.createdAt,
+      updatedAt: masterData.updatedAt,
+      publishedAt: masterData.publishedAt,
     };
   }));
 

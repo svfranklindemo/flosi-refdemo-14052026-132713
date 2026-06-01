@@ -58,6 +58,50 @@ function readValue(field) {
   return '';
 }
 
+function toCalendarMap(master) {
+  const entries = Array.isArray(master?._metadata?.calendarMetadata)
+    ? master._metadata.calendarMetadata
+    : [];
+  return entries.reduce((acc, item) => {
+    if (item?.name && item?.value) acc[item.name] = item.value;
+    return acc;
+  }, {});
+}
+
+function parseMasterFields(master) {
+  if (!master || typeof master !== 'object') return {};
+  const calendarMap = toCalendarMap(master);
+  return {
+    content: readValue(master.content) || '',
+    createdAt: calendarMap['jcr:created'] || '',
+    updatedAt: calendarMap['cq:lastModified'] || '',
+    publishedAt: calendarMap['cq:lastPublished'] || '',
+  };
+}
+
+function formatDateTime(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
+}
+
+function formatRelativeFromNow(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const diffMs = Date.now() - date.getTime();
+  const minutes = Math.max(1, Math.round(diffMs / 60000));
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} h`;
+  const days = Math.round(hours / 24);
+  return `${days} d`;
+}
+
 function extractGraphqlItems(payload) {
   const data = payload?.data;
   if (!data || typeof data !== 'object') return [];
@@ -90,7 +134,22 @@ function normalizeNewsFromGraphql(item) {
     category: readValue(item.category) || '',
     slug: String(item.slug || '').trim(),
     image: readValue(item.media) || '',
+    createdAt: readValue(item.createdAt) || '',
+    updatedAt: readValue(item.updatedAt) || '',
+    publishedAt: readValue(item.publishedAt) || '',
   };
+}
+
+async function fetchMasterJson(path) {
+  if (!path) return null;
+  const url = `${normalizePath(path)}/jcr:content/data/master.json`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    return await response.json();
+  } catch (_) {
+    return null;
+  }
 }
 
 async function fetchNewsFromPersistedQuery(folderPath, graphqlEndpoint, persistedQueryPath) {
@@ -121,14 +180,28 @@ async function fetchNewsFromStaticJson(edgeDataPath) {
   return rawItems.map(normalizeNewsFromGraphql).filter(Boolean);
 }
 
+function buildAueAttrs(itemPath, prop) {
+  if (!isAuthorRuntime() || !itemPath || !prop) return '';
+  return ` data-aue-resource="urn:aemconnection:${itemPath}/jcr:content/data/master" data-aue-prop="${prop}" data-aue-type="text"`;
+}
+
 function renderNewsDetail(block, item) {
+  const published = formatDateTime(item.publishedAt || item.createdAt);
+  const updated = formatDateTime(item.updatedAt || item.publishedAt || item.createdAt);
+  const updatedAgo = formatRelativeFromNow(item.updatedAt || item.publishedAt || item.createdAt);
+
   block.innerHTML = `
     <article class="news-detail-article">
-      ${item.category ? `<p class="news-detail-category">${item.category}</p>` : ''}
-      <h1 class="news-detail-title">${item.title}</h1>
+      ${item.category ? `<p class="news-detail-category"${buildAueAttrs(item.id, 'category')}>${item.category}</p>` : ''}
+      <h1 class="news-detail-title"${buildAueAttrs(item.id, 'title')}>${item.title}</h1>
+      <div class="news-detail-meta">
+        ${published ? `<span class="news-detail-meta-item">Publicado: ${published}</span>` : ''}
+        ${updated ? `<span class="news-detail-meta-item">Atualizado: ${updated}</span>` : ''}
+        ${updatedAgo ? `<span class="news-detail-meta-item">há ${updatedAgo}</span>` : ''}
+      </div>
       ${item.image ? `<p class="news-detail-image"><img src="${item.image}" alt="${item.title}"></p>` : ''}
-      ${item.description ? `<p class="news-detail-description">${item.description}</p>` : ''}
-      ${item.content ? `<div class="news-detail-content">${item.content}</div>` : ''}
+      ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}
+      ${item.content ? `<div class="news-detail-content"${buildAueAttrs(item.id, 'content')}>${item.content}</div>` : ''}
     </article>
   `;
 }
@@ -198,5 +271,15 @@ export default async function decorate(block) {
     return;
   }
 
-  renderNewsDetail(block, current);
+  const master = await fetchMasterJson(current.id);
+  const masterFields = parseMasterFields(master);
+  const enriched = {
+    ...current,
+    content: masterFields.content || current.content || '',
+    createdAt: masterFields.createdAt || current.createdAt || '',
+    updatedAt: masterFields.updatedAt || current.updatedAt || '',
+    publishedAt: masterFields.publishedAt || current.publishedAt || '',
+  };
+
+  renderNewsDetail(block, enriched);
 }

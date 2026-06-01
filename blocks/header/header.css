@@ -513,3 +513,43 @@ header nav .nav-tools .lang-switcher { display: inline-flex; }
   }
 
 }
+
+/* Meganoticias nav styles */
+.header-nav-brand a {
+  color: var(--color-brand-primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+}
+
+.header-nav-sections a[aria-current="page"],
+.header-nav-sections a:hover {
+  color: var(--color-brand-primary);
+  border-bottom: 2px solid var(--color-brand-primary);
+  padding-bottom: 2px;
+}
+
+/* Badge En Vivo no nav */
+.header-nav-sections a[href*="vivo"],
+.header-nav-sections li:first-child a {
+  color: var(--color-brand-live);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.header-nav-sections li:first-child a::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background: var(--color-brand-live);
+  border-radius: 50%;
+  animation: live-pulse 1.5s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}

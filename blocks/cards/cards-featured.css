@@ -1,0 +1,91 @@
+/* Variante "featured" — Cards (featured) */
+.cards.featured {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.cards.featured > ul {
+  display: contents;
+}
+
+.cards.featured > ul > li {
+  list-style: none;
+  background: var(--background-color, #fff);
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Primeiro card ocupa a coluna esquerda inteira */
+.cards.featured > ul > li:first-child {
+  grid-row: span 3;
+}
+
+.cards.featured > ul > li:first-child .cards-card-image picture img {
+  height: 280px;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* Cards laterais menores */
+.cards.featured > ul > li:not(:first-child) {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+}
+
+.cards.featured > ul > li:not(:first-child) .cards-card-image {
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.cards.featured > ul > li:not(:first-child) .cards-card-image picture img {
+  width: 110px;
+  height: 90px;
+  object-fit: cover;
+}
+
+.cards.featured > ul > li:not(:first-child) .cards-card-body {
+  padding: 0.75rem;
+  flex: 1;
+}
+
+.cards.featured .cards-card-body {
+  padding: 1rem 1.25rem;
+}
+
+/* Badge de categoria (campo tag) */
+.cards .cards-card-body [data-tag] strong,
+.cards .tag-label {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  margin-bottom: 0.5rem;
+  background: var(--color-brand-primary, #085041);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .cards.featured {
+    grid-template-columns: 1fr;
+  }
+  .cards.featured > ul > li:first-child {
+    grid-row: auto;
+  }
+  .cards.featured > ul > li:not(:first-child) {
+    flex-direction: column;
+  }
+  .cards.featured > ul > li:not(:first-child) .cards-card-image {
+    width: 100%;
+  }
+  .cards.featured > ul > li:not(:first-child) .cards-card-image picture img {
+    width: 100%;
+    height: 160px;
+  }
+}

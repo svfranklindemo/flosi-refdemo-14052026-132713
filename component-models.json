@@ -5720,35 +5720,54 @@
       {
         "component": "select",
         "name": "herolayout",
-        "label": "Hero Layout Style",
+        "label": "Layout do Hero",
         "options": [
           {
-            "name": "Default",
+            "name": "Imagem de Fundo (padrão)",
             "value": "overlay"
           },
           {
-            "name": "Image Left",
+            "name": "Imagem à Esquerda + Texto",
             "value": "image-left"
           },
           {
-            "name": "Image Right",
+            "name": "Imagem à Direita + Texto",
             "value": "image-right"
           },
           {
-            "name": "Image Top",
+            "name": "Imagem em Cima + Texto",
             "value": "image-top"
           },
           {
-            "name": "Image Bottom",
+            "name": "Imagem em Baixo + Texto",
             "value": "image-bottom"
           },
           {
-            "name": "Image-Background Text-Left",
+            "name": "Fundo + Texto à Esquerda",
             "value": "image-background-text-left"
           },
           {
-            "name": "Image-Background Text-Right",
+            "name": "Fundo + Texto à Direita",
             "value": "image-background-text-right"
+          }
+        ]
+      },
+      {
+        "component": "select",
+        "name": "livemode",
+        "label": "Badge ao vivo / breaking",
+        "options": [
+          {
+            "name": "Desativado",
+            "value": "off"
+          },
+          {
+            "name": "🔴 EN VIVO",
+            "value": "live"
+          },
+          {
+            "name": "⚡ BREAKING NEWS",
+            "value": "breaking"
           }
         ]
       },

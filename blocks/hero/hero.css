@@ -9,7 +9,7 @@
 .hero {
   position: relative;
   padding: 40px 24px;
-  min-height: 700px;
+  min-height: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -144,29 +144,77 @@
 /* --------------------------
    Layout Variations
 --------------------------- */
+/* ── Image-side variants (left/right): split 50/50 ── */
 .hero.image-left,
-.hero.image-right,
-.hero.image-top,
-.hero.image-bottom {
-  gap: 40px;
+.hero.image-right {
   padding: 0;
-  min-height: auto;
+  min-height: 380px;
+  gap: 0;
+  align-items: stretch;
+  overflow: hidden;
 }
-
 
 .hero.image-left {
   flex-direction: row;
-  justify-content: flex-start;
 }
 .hero.image-right {
   flex-direction: row-reverse;
-  justify-content: flex-start;
 }
+
+.hero.image-left > div:first-child,
+.hero.image-right > div:first-child {
+  flex: 0 0 52%;
+  overflow: hidden;
+}
+
+.hero.image-left picture,
+.hero.image-right picture {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+}
+
+.hero.image-left img,
+.hero.image-right img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero.image-left > div:nth-child(2),
+.hero.image-right > div:nth-child(2) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 48px;
+  background: var(--background-color);
+}
+
+/* ── Image-top/bottom variants ── */
+.hero.image-top,
+.hero.image-bottom {
+  padding: 0;
+  min-height: auto;
+  gap: 0;
+  overflow: hidden;
+}
+
 .hero.image-top {
   flex-direction: column;
 }
 .hero.image-bottom {
   flex-direction: column-reverse;
+}
+
+.hero.image-top picture,
+.hero.image-bottom picture {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 280px;
+  flex-shrink: 0;
 }
 
 /* Image Background Text Left - Text overlaid on background image, left-aligned */
@@ -205,49 +253,8 @@
   z-index: 1;
 }
 
-.hero.image-left > div:first-child picture,
-.hero.image-right > div:first-child picture {
-  height: 100%;
-  width: 100%;
-}
-
-.hero.image-top picture,
-.hero.image-bottom picture {
-  width: 100%;
-  height: 400px;
-}
-
-/* Text align adjustments */
-.hero.image-left > div:first-child,
-.hero.image-right > div:first-child {
-  flex: 0 0 50%;
-}
-
-.hero.image-left > div:nth-child(2),
-.hero.image-right > div:nth-child(2) {
-  flex: 0 0 50%;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 40px;
-  box-sizing: border-box;
-}
-
-.hero.image-right > div:nth-child(2) {
-  padding-left: 80px;
-}
-
 picture {
-    line-height: 0;
-}
-/* Box shadow for layout variations */
-.hero.image-left,
-.hero.image-right,
-.hero.image-top,
-.hero.image-bottom {
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  overflow: hidden;
+  line-height: 0;
 }
 .hero.image-left h2,
 .hero.image-left h3,
@@ -339,7 +346,7 @@ picture {
 }
 
 @media (width < 1024px) {
-  .hero { min-height: 650px; }
+  .hero { min-height: 420px; }
   
   .hero.image-background-text-left {
     padding: 50px 30px;
@@ -351,7 +358,7 @@ picture {
 }
 
 @media (width < 768px) {
-  .hero { min-height: 600px; }
+  .hero { min-height: 360px; }
 
   .hero.image-left,
   .hero.image-right {
@@ -547,4 +554,58 @@ picture {
 
 .hero.block.overlay .button-container.cta-link a.button::after  ,.hero.image-background-text-left .button-container.cta-link a.button::after,.hero.image-background-text-right .button-container.cta-link a.button::after  {
   color: var(--text-light);
+}
+/* ── Live / Breaking News badge ────────────────
+   Controlado pelo campo "livemode" no modelo
+   Adiciona classe .live-badge ou .breaking-badge ao bloco via JS
+*/
+.hero .hero-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-brand-live, #D85A30);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 3px;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.hero .hero-live-badge .live-dot {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+  border-radius: 50%;
+  animation: live-pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+/* Mobile: side-by-side variants stack */
+@media (width < 768px) {
+  .hero.image-left,
+  .hero.image-right {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .hero.image-left > div:first-child,
+  .hero.image-right > div:first-child {
+    flex: 0 0 auto;
+    height: 220px;
+    width: 100%;
+  }
+
+  .hero.image-left > div:nth-child(2),
+  .hero.image-right > div:nth-child(2) {
+    padding: 24px;
+  }
+
+  .hero.image-top picture,
+  .hero.image-bottom picture {
+    height: 200px;
+  }
 }

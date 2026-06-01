@@ -239,6 +239,7 @@ export default async function decorate(block) {
   let maxItems = 6;
   let ctaLabel = 'Ver detalhes';
   let detailBasePath = '/news';
+  let allNewsPath = '/en/news-all';
   let emptyStateText = 'Nenhuma notícia encontrada.';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
   let authorGraphqlEndpoint = '';
@@ -258,6 +259,7 @@ export default async function decorate(block) {
       case 'maxitems': maxItems = Number.parseInt(value, 10) || 6; break;
       case 'ctalabel': ctaLabel = value; break;
       case 'detailbasepath': detailBasePath = value; break;
+      case 'allnewspath': allNewsPath = value; break;
       case 'emptystatetext': emptyStateText = value; break;
       case 'persistedquerypath':
       case 'persistedquery':
@@ -281,6 +283,7 @@ export default async function decorate(block) {
 
   const header = createElement('div', 'news-feed-header', `
     <h2 class="news-feed-title block-section-title">${title}</h2>
+    <a class="news-feed-ver-todas" href="${allNewsPath}">Ver todas →</a>
   `);
   const list = createElement('div', 'news-feed-results');
   list.innerHTML = '<p class="news-feed-loading">Carregando notícias...</p>';

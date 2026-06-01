@@ -246,6 +246,7 @@ export default async function decorate(block) {
   const cfPaths = [];
   let edgeDataPath = '/news-data.json';
   let detailBasePath = '/en/news';
+  let allNewsPath = '/en/news-all';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
   let authorGraphqlEndpoint = '';
   let sectionTitle = 'Noticias destacadas';
@@ -262,6 +263,7 @@ export default async function decorate(block) {
     else if (key === 'cf4') cfPaths[3] = value;
     else if (key === 'edgedatapath') edgeDataPath = value;
     else if (key === 'detailbasepath') detailBasePath = value;
+    else if (key === 'allnewspath') allNewsPath = value;
     else if (key === 'persistedquerypath' || key === 'persistedquery') persistedQueryPath = value;
     else if (key === 'authorgraphqlendpoint') authorGraphqlEndpoint = value;
     else if (key === 'title') sectionTitle = value;
@@ -306,7 +308,11 @@ export default async function decorate(block) {
   titleEl.className = 'nf-title block-section-title';
   titleEl.textContent = sectionTitle;
   header.appendChild(titleEl);
-  header.appendChild(Object.assign(document.createElement('span'), { className: 'nf-bar' }));
+  const verTodas = document.createElement('a');
+  verTodas.className = 'nf-ver-todas';
+  verTodas.href = allNewsPath;
+  verTodas.textContent = 'Ver todas →';
+  header.appendChild(verTodas);
   block.appendChild(header);
 
   // Grid: primeiro item = destaque, restantes = stack lateral

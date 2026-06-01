@@ -144,26 +144,24 @@
 /* --------------------------
    Layout Variations
 --------------------------- */
-/* ── Image-side variants (left/right): split 50/50 ── */
+/* ── Image Left / Right: side-by-side split ────────── */
 .hero.image-left,
 .hero.image-right {
   padding: 0;
-  min-height: 380px;
+  min-height: 400px;
   gap: 0;
   align-items: stretch;
   overflow: hidden;
+  background: var(--background-color);
 }
 
-.hero.image-left {
-  flex-direction: row;
-}
-.hero.image-right {
-  flex-direction: row-reverse;
-}
+.hero.image-left { flex-direction: row; }
+.hero.image-right { flex-direction: row-reverse; }
 
+/* Image side: 55% width */
 .hero.image-left > div:first-child,
 .hero.image-right > div:first-child {
-  flex: 0 0 52%;
+  flex: 0 0 55%;
   overflow: hidden;
 }
 
@@ -180,41 +178,121 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
+/* Text side */
 .hero.image-left > div:nth-child(2),
 .hero.image-right > div:nth-child(2) {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 40px 48px;
+  padding: 48px 56px;
   background: var(--background-color);
 }
 
-/* ── Image-top/bottom variants ── */
+.hero.image-left h1, .hero.image-right h1 {
+  font-size: clamp(1.6rem, 2.5vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--dark-color);
+  margin: 0 0 16px;
+  text-align: left;
+  text-shadow: none;
+}
+
+.hero.image-left h2, .hero.image-right h2,
+.hero.image-left h3, .hero.image-right h3 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--main-accent-color);
+  margin: 0 0 10px;
+  text-align: left;
+  display: block;
+  text-shadow: none;
+}
+
+.hero.image-left p, .hero.image-right p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+  margin: 0 0 24px;
+  text-align: left;
+  max-width: none;
+  width: 100%;
+  text-shadow: none;
+}
+
+/* ── Image Top / Bottom: stacked ───────────────────── */
 .hero.image-top,
 .hero.image-bottom {
   padding: 0;
   min-height: auto;
   gap: 0;
   overflow: hidden;
+  background: var(--background-color);
 }
 
-.hero.image-top {
-  flex-direction: column;
-}
-.hero.image-bottom {
-  flex-direction: column-reverse;
-}
+.hero.image-top { flex-direction: column; }
+.hero.image-bottom { flex-direction: column-reverse; }
 
 .hero.image-top picture,
 .hero.image-bottom picture {
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 280px;
+  height: 300px;
   flex-shrink: 0;
+}
+
+.hero.image-top img,
+.hero.image-bottom img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Text area below/above image */
+.hero.image-top > div:nth-child(2),
+.hero.image-bottom > div:nth-child(2) {
+  padding: 40px 48px;
+  text-align: center;
+}
+
+.hero.image-top h1, .hero.image-bottom h1 {
+  font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--dark-color);
+  margin: 0 0 16px;
+  text-shadow: none;
+}
+
+.hero.image-top h2, .hero.image-bottom h2,
+.hero.image-top h3, .hero.image-bottom h3 {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--main-accent-color);
+  margin: 0 0 12px;
+  display: block;
+  text-shadow: none;
+}
+
+.hero.image-top p, .hero.image-bottom p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #555;
+  margin: 0 0 24px;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  text-shadow: none;
 }
 
 /* Image Background Text Left - Text overlaid on background image, left-aligned */
@@ -245,39 +323,8 @@
   margin: 0;
 }
 
-.hero.image-left picture,
-.hero.image-right picture,
-.hero.image-top picture,
-.hero.image-bottom picture {
-  position: relative;
-  z-index: 1;
-}
-
 picture {
   line-height: 0;
-}
-.hero.image-left h2,
-.hero.image-left h3,
-.hero.image-left h4,
-.hero.image-left h5,
-.hero.image-left h6,
-.hero.image-left p,
-.hero.image-right h2,
-.hero.image-right h3,
-.hero.image-right h4,
-.hero.image-right h5,
-.hero.image-right h6,
-.hero.image-right p {
-  text-align: left;
-  margin: 0;
-  width: 100%;
-  max-width: none;
-  color: var(--text-color);
-    text-shadow: unset;
-}
-.hero.image-left h1,.hero.image-right h1{
-  color: var(--text-color);
-  text-shadow: unset;
 }
 
 .hero.image-background-text-left h1,
@@ -318,25 +365,6 @@ picture {
   margin-top: 30px;
 }
 
-.hero.image-top h1,
-.hero.image-top h2,
-.hero.image-top h3,
-.hero.image-top h4,
-.hero.image-top h5,
-.hero.image-top h6,
-.hero.image-top p,
-.hero.image-bottom h1,
-.hero.image-bottom h2,
-.hero.image-bottom h3,
-.hero.image-bottom h4,
-.hero.image-bottom h5,
-.hero.image-bottom h6,
-.hero.image-bottom p{
-  text-align: center;
-  max-width: none;
-  color: var(--text-color);
-    text-shadow: unset;
-}
 /* --------------------------
    Responsive
 --------------------------- */
@@ -555,35 +583,6 @@ picture {
 .hero.block.overlay .button-container.cta-link a.button::after  ,.hero.image-background-text-left .button-container.cta-link a.button::after,.hero.image-background-text-right .button-container.cta-link a.button::after  {
   color: var(--text-light);
 }
-/* ── Live / Breaking News badge ────────────────
-   Controlado pelo campo "livemode" no modelo
-   Adiciona classe .live-badge ou .breaking-badge ao bloco via JS
-*/
-.hero .hero-live-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--color-brand-live, #D85A30);
-  color: #fff;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 4px 12px;
-  border-radius: 3px;
-  margin-bottom: 12px;
-  line-height: 1.4;
-}
-
-.hero .hero-live-badge .live-dot {
-  width: 6px;
-  height: 6px;
-  background: #fff;
-  border-radius: 50%;
-  animation: live-pulse 1.5s ease-in-out infinite;
-  flex-shrink: 0;
-}
-
 /* Mobile: side-by-side variants stack */
 @media (width < 768px) {
   .hero.image-left,

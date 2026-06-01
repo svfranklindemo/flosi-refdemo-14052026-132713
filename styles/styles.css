@@ -321,6 +321,12 @@ body.appear {
   display: block;
   overflow-x: hidden;
 }
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
 body.gray-theme {
   filter: grayscale(100%);
 }

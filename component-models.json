@@ -399,6 +399,25 @@
     ]
   },
   {
+    "id": "code",
+    "fields": [
+      {
+        "component": "text",
+        "name": "content",
+        "label": "Content",
+        "valueType": "string",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "name": "styles",
+        "label": "Styles",
+        "valueType": "string",
+        "value": ""
+      }
+    ]
+  },
+  {
     "id": "columns",
     "fields": [
       {

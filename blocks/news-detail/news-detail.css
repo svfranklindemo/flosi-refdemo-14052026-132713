@@ -58,7 +58,7 @@
   border-bottom: 1px solid #e5e7eb;
   padding: 0.85rem 0;
   display: flex;
-  align-items: stretch;
+  align-items: center;
   flex-wrap: wrap;
   gap: 0.55rem;
 }
@@ -71,6 +71,7 @@
   font-weight: 700;
   margin-right: 0.45rem;
   min-height: 33px;
+  line-height: 1;
 }
 
 .news-detail-share-link {
@@ -87,6 +88,11 @@
   text-decoration: none;
   background: #f8fafc;
   transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.news-detail-share-link::after {
+  content: none !important;
 }
 
 .news-detail-share-link:hover {

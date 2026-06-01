@@ -668,6 +668,7 @@ main .cards-container {
 main > .section {
   margin: 40px 0;
   min-height: 50px;
+  overflow-x: clip;
 }
 
 main > .section > div {
@@ -676,14 +677,8 @@ main > .section > div {
   padding: 0 24px;
 }
 
-/* Garante que nenhum bloco-wrapper ultrapasse 1200px */
-main > .section > div > div {
-  max-width: 100%;
-}
-
 /* Exceção: seções explicitamente marcadas como full-width no AEM */
-main > .section[data-sec-full-width="true"] > div,
-main > .section[data-sec-full-width="true"] > div > div {
+main > .section[data-sec-full-width="true"] > div {
   max-width: 100%;
   padding: 0;
 }

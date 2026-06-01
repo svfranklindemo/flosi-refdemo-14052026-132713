@@ -126,8 +126,8 @@
   height: 25px;
   padding: 0 10px;
   background: var(--main-accent-color, #12d8b1);
-  color: #131313;
-  font-size: 11px;
+  color: #fff;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: 1.5px;
   text-transform: uppercase;

@@ -217,12 +217,10 @@ header nav .nav-sections ul > li {
 
 header nav .nav-sections ul > li > a {
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--nav-text-color);
   text-decoration: none;
   font-family: var(--body-font-family);
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
 }
 header nav .nav-sections ul > li > a:hover {
   color: var(--main-accent-color);
@@ -270,6 +268,13 @@ header nav .nav-sections ul > li > ul > li {
     white-space: nowrap;
     flex: 1 1 auto;
     justify-content: center;
+    height: 100%;
+  }
+
+  header nav .nav-sections .default-content-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
   }
 
   header nav[aria-expanded='true'] .nav-sections {
@@ -304,16 +309,19 @@ header nav .nav-sections ul > li > ul > li {
 
   header nav .nav-sections ul {
     display: flex;
-    gap: 50px;
+    gap: 40px;
     margin: 0;
     align-items: center;
-    justify-content: center;
+    height: 100%;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li {
     flex: 0 1 auto;
     position: relative;
     color: var(--nav-text-color);
+    display: flex;
+    align-items: center;
+    height: 100%;
   }
 
   header nav .nav-sections .default-content-wrapper > ul > li > ul {

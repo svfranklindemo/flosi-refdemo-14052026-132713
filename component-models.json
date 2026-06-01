@@ -399,25 +399,6 @@
     ]
   },
   {
-    "id": "code",
-    "fields": [
-      {
-        "component": "text",
-        "name": "content",
-        "label": "Content",
-        "valueType": "string",
-        "value": ""
-      },
-      {
-        "component": "text",
-        "name": "styles",
-        "label": "Styles",
-        "valueType": "string",
-        "value": ""
-      }
-    ]
-  },
-  {
     "id": "columns",
     "fields": [
       {
@@ -5812,25 +5793,6 @@
             "value": "theme-light"
           }
         ]
-      }
-    ]
-  },
-  {
-    "id": "html-css",
-    "fields": [
-      {
-        "component": "text",
-        "name": "contenido",
-        "label": "Contenido",
-        "valueType": "string",
-        "value": ""
-      },
-      {
-        "component": "text",
-        "name": "estilo",
-        "label": "Estilo",
-        "valueType": "string",
-        "value": ""
       }
     ]
   },

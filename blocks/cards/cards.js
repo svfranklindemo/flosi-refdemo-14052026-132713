@@ -9,24 +9,53 @@ export default async function decorate(block) {
 import { createOptimizedPicture } from '../../scripts/aem.js';
 import { moveInstrumentation } from '../../scripts/scripts.js';
 
+const KNOWN_CTA_STYLES = new Set([
+  'button',
+  'button-secondary',
+  'button-dark',
+  'cta-button',
+  'cta-button-secondary',
+  'cta-button-dark',
+  'default',
+]);
+
+const KNOWN_CARD_STYLES = new Set([
+  'default',
+  'image-top',
+  'image-bottom',
+  'image-left',
+  'image-right',
+  'teaser-overlay',
+  'gradient',
+]);
+
+function readConfigText(div) {
+  const paragraph = div?.querySelector('p');
+  return paragraph?.textContent?.trim() || '';
+}
+
 export default function decorate(block) {
   const ul = document.createElement('ul');
   [...block.children].forEach((row) => {
     const li = document.createElement('li');
-    
-    // Read card style from the third div (index 2)
-    const styleDiv = row.children[2];
-    const styleParagraph = styleDiv?.querySelector('p');
-    const cardStyle = styleParagraph?.textContent?.trim() || 'default';
+
+    const configValues = [...row.children]
+      .slice(2)
+      .map((div) => readConfigText(div))
+      .filter(Boolean);
+
+    const ctaStyle = configValues.find((value) => KNOWN_CTA_STYLES.has(value)) || 'button';
+    const cardStyle = configValues.find((value) => KNOWN_CARD_STYLES.has(value)) || 'default';
+    const tagLabel = configValues.find((value) => !KNOWN_CTA_STYLES.has(value) && !KNOWN_CARD_STYLES.has(value)) || '';
+
     if (cardStyle && cardStyle !== 'default') {
       li.className = cardStyle;
     }
-    
-    // Read CTA style from the fourth div (index 3)
-    const ctaDiv = row.children[3];
-    const ctaParagraph = ctaDiv?.querySelector('p');
-    const ctaStyle = ctaParagraph?.textContent?.trim() || 'default';
-    
+
+    if (tagLabel) {
+      li.dataset.cardTag = tagLabel;
+    }
+
     moveInstrumentation(row, li);
     while (row.firstElementChild) li.append(row.firstElementChild);
     
@@ -40,25 +69,13 @@ export default function decorate(block) {
       else if (index === 1) {
         div.className = 'cards-card-body';
       }
-      // Third div (index 2) - Card style configuration
-      else if (index === 2) {
+      // Config columns (index >= 2) stay hidden
+      else if (index >= 2) {
         div.className = 'cards-config';
         const p = div.querySelector('p');
         if (p) {
           p.style.display = 'none'; // Hide the configuration text
         }
-      }
-      // Fourth div (index 3) - CTA style configuration
-      else if (index === 3) {
-        div.className = 'cards-config';
-        const p = div.querySelector('p');
-        if (p) {
-          p.style.display = 'none'; // Hide the configuration text
-        }
-      }
-      // Any other divs
-      else {
-        div.className = 'cards-card-body';
       }
     });
     

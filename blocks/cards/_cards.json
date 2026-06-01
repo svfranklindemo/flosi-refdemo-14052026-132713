@@ -50,6 +50,13 @@
           "valueType": "string"
         },
         {
+          "component": "text",
+          "name": "tag",
+          "label": "Tag/Selo",
+          "valueType": "string",
+          "value": ""
+        },
+        {
           "component": "select",
           "name": "ctastyle",
           "label": "CTA Style",

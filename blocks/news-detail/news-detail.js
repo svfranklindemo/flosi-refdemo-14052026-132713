@@ -102,7 +102,15 @@ async function fetchNewsFromPersistedQuery(folderPath, graphqlEndpoint, persiste
 
 async function fetchNewsFromStaticJson(edgeDataPath) {
   const path = String(edgeDataPath || '/news-data.json').trim() || '/news-data.json';
-  const response = await fetch(path);
+  const url = new URL(path, window.location.origin);
+  url.searchParams.set('ts', `${Date.now()}`);
+  const response = await fetch(url.toString(), {
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+    },
+  });
   if (!response.ok) throw new Error(`Static news request failed with status ${response.status}.`);
   const payload = await response.json();
   const rawItems = Array.isArray(payload?.items)

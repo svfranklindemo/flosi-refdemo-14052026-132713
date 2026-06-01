@@ -41,7 +41,7 @@ const KNOWN_TAGS = new Map([
 
 function readConfigText(div) {
   const paragraph = div?.querySelector('p');
-  return paragraph?.textContent?.trim() || '';
+  return (paragraph?.textContent || div?.textContent || '').trim();
 }
 
 export default function decorate(block) {
@@ -49,14 +49,42 @@ export default function decorate(block) {
   [...block.children].forEach((row) => {
     const li = document.createElement('li');
 
-    const configValues = [...row.children]
-      .slice(2)
-      .map((div) => readConfigText(div))
-      .filter(Boolean);
+    const configDivs = [...row.children].slice(2);
+    let ctaStyle = 'button';
+    let cardStyle = 'default';
+    let rawTag = '';
 
-    const ctaStyle = configValues.find((value) => KNOWN_CTA_STYLES.has(value)) || 'button';
-    const cardStyle = configValues.find((value) => KNOWN_CARD_STYLES.has(value)) || 'default';
-    const rawTag = configValues.find((value) => KNOWN_TAGS.has(value.toLowerCase().trim())) || '';
+    configDivs.forEach((div) => {
+      const propName = (div.getAttribute('data-aue-prop') || '').toLowerCase().trim();
+      const value = readConfigText(div);
+      if (!value) return;
+
+      if (propName === 'ctastyle' && KNOWN_CTA_STYLES.has(value)) {
+        ctaStyle = value;
+        return;
+      }
+      if (propName === 'style' && KNOWN_CARD_STYLES.has(value)) {
+        cardStyle = value;
+        return;
+      }
+      if (propName === 'tag' && KNOWN_TAGS.has(value.toLowerCase().trim())) {
+        rawTag = value;
+      }
+    });
+
+    if (!rawTag || cardStyle === 'default' || ctaStyle === 'button') {
+      const configValues = configDivs.map((div) => readConfigText(div)).filter(Boolean);
+      if (ctaStyle === 'button') {
+        ctaStyle = configValues.find((value) => KNOWN_CTA_STYLES.has(value)) || 'button';
+      }
+      if (cardStyle === 'default') {
+        cardStyle = configValues.find((value) => KNOWN_CARD_STYLES.has(value)) || 'default';
+      }
+      if (!rawTag) {
+        rawTag = configValues.find((value) => KNOWN_TAGS.has(value.toLowerCase().trim())) || '';
+      }
+    }
+
     const tagLabel = rawTag ? KNOWN_TAGS.get(rawTag.toLowerCase().trim()) : '';
 
     if (cardStyle && cardStyle !== 'default') {

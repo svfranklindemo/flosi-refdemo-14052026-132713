@@ -304,6 +304,35 @@
       },
       {
         "component": "select",
+        "name": "style",
+        "label": "Style",
+        "valueType": "string",
+        "value": "image-top",
+        "options": [
+          {
+            "name": "Image Top",
+            "value": "image-top"
+          },
+          {
+            "name": "Image Bottom",
+            "value": "image-bottom"
+          },
+          {
+            "name": "Image Left",
+            "value": "image-left"
+          },
+          {
+            "name": "Image Right",
+            "value": "image-right"
+          },
+          {
+            "name": "Teaser Overlay",
+            "value": "teaser-overlay"
+          }
+        ]
+      },
+      {
+        "component": "select",
         "name": "tag",
         "label": "Tag",
         "valueType": "string",

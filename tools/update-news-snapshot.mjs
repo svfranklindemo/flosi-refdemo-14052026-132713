@@ -5,7 +5,14 @@ const endpoint = process.env.NEWS_GRAPHQL_URL
 const output = process.env.NEWS_OUTPUT_PATH || './news-data.json';
 
 async function run() {
-  const response = await fetch(endpoint);
+  const url = new URL(endpoint);
+  url.searchParams.set('ts', `${Date.now()}`);
+  const response = await fetch(url.toString(), {
+    headers: {
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+    },
+  });
   if (!response.ok) {
     throw new Error(`Failed to fetch news snapshot: ${response.status}`);
   }

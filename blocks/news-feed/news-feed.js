@@ -84,7 +84,7 @@ function extractNewsFromGraphql(item) {
     category: readFieldValue(item.category) || '',
     slug: String(item.slug || '').trim(),
     image: readFieldValue(item.media) || '',
-    createdAt: String(item.createdAt || item._createdAt || '').trim(),
+    createdAt: String(item.createdAt || item.publishedAt || item.updatedAt || item._createdAt || '').trim(),
   };
 }
 

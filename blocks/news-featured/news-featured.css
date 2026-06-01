@@ -79,9 +79,9 @@
 
 .news-featured .nf-card-big .nf-card-title {
   display: block;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 700;
-  line-height: 1.4;
+  line-height: 1.35;
   color: var(--dark-color);
   margin: 6px 0 8px;
   white-space: normal;
@@ -116,23 +116,22 @@
 }
 
 .news-featured .nf-card-horiz .nf-card-title {
-  display: block;
-  font-size: 13px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 15px;
   font-weight: 600;
   line-height: 1.4;
   color: var(--dark-color);
   margin: 3px 0 5px;
   white-space: normal;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 /* ── Category — same standard across all news blocks ── */
 .news-featured .nf-card-cat {
   display: inline-block;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -142,7 +141,7 @@
 
 /* ── Description ─────────────────────────────── */
 .news-featured .nf-card-description {
-  font-size: 13px;
+  font-size: 15px;
   color: #555;
   line-height: 1.5;
   margin: 4px 0 8px;
@@ -156,9 +155,9 @@
 /* ── Timestamp ───────────────────────────────── */
 .news-featured .nf-card-meta {
   display: block;
-  font-size: 11px;
-  color: #999;
-  margin-top: 4px;
+  font-size: 12px;
+  color: #888;
+  margin-top: 6px;
 }
 
 /* ── Responsive ──────────────────────────────── */

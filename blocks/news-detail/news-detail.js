@@ -226,9 +226,9 @@ async function fetchNewsFromStaticJson(edgeDataPath) {
   return rawItems.map(normalizeNewsFromGraphql).filter(Boolean);
 }
 
-function buildAueAttrs(itemPath, prop) {
+function buildAueAttrs(itemPath, prop, type = 'text') {
   if (!isAuthorRuntime() || !itemPath || !prop) return '';
-  return ` data-aue-resource="urn:aemconnection:${itemPath}/jcr:content/data/master" data-aue-prop="${prop}" data-aue-type="text"`;
+  return ` data-aue-resource="urn:aemconnection:${itemPath}/jcr:content/data/master" data-aue-prop="${prop}" data-aue-type="${type}"`;
 }
 
 function buildShareUrl(network, title) {
@@ -287,7 +287,7 @@ function renderNewsDetail(block, item) {
     <article class="news-detail-article"${referenceAue}>
       <p class="news-detail-category news-cat-badge" data-category="${(item.category || 'Nacional').toLowerCase()}"${buildAueAttrs(item.id, 'category')}>${item.category || 'Nacional'}</p>
       <h1 class="news-detail-title"${buildAueAttrs(item.id, 'title')}>${item.title}</h1>
-      ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description')}>${item.description}</p>` : ''}
+      ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description', 'richtext')}>${item.description}</p>` : ''}
 
       <div class="news-detail-meta-row">
         ${authorName ? `
@@ -316,7 +316,7 @@ function renderNewsDetail(block, item) {
           <img src="${item.image}" alt="${item.title}">
         </div>
       ` : ''}
-      ${item.content ? `<div class="news-detail-content"${buildAueAttrs(item.id, 'content')}>${item.content}</div>` : ''}
+      ${item.content ? `<div class="news-detail-content"${buildAueAttrs(item.id, 'content', 'richtext')}>${item.content}</div>` : ''}
     </article>
   `;
 }

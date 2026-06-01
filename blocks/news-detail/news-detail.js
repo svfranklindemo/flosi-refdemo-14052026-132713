@@ -263,6 +263,19 @@ function renderNewsDetail(block, item) {
     ? ` data-aue-resource="urn:aemconnection:${item.id}/jcr:content/data/master" data-aue-type="reference" data-aue-label="Content Fragment"`
     : '';
 
+  // Inject meta so sidekick knows which CF is being rendered
+  if (item.id) {
+    let meta = document.querySelector('meta[name="cf-path"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'cf-path';
+      document.head.appendChild(meta);
+    }
+    meta.content = item.id;
+    // Also set the page title to the article title for better context
+    document.title = `${item.title} | ${document.title.split('|').pop().trim()}`;
+  }
+
   // Author initials avatar
   const initials = authorName
     ? authorName.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase()

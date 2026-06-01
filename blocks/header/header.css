@@ -223,7 +223,7 @@ header nav .nav-sections ul > li > a {
   font-family: var(--body-font-family);
 }
 header nav .nav-sections ul > li:first-child > a {
-  color: #e4003a;
+  color: var(--color-brand-live, #D85A30);
   font-weight: 700;
 }
 

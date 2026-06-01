@@ -478,9 +478,66 @@ picture {
   border-color: var(--dark-color);
 }
 
-.hero.block.overlay div:nth-child(2),.hero.image-background-text-left div:nth-child(2),.hero.image-background-text-right div:nth-child(2) {
+.hero.image-background-text-left div:nth-child(2),.hero.image-background-text-right div:nth-child(2) {
   padding: 20px;
   background: rgb(0 0 0 / 50%);
+}
+
+/* Meganoticias overlay: gradient verde + texto bottom-left */
+.hero.block.overlay {
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.hero.block.overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(8,80,65,0.88) 0%, rgba(15,110,86,0.55) 55%, rgba(0,0,0,0.15) 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.hero.block.overlay div:nth-child(2) {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  padding: 32px 40px;
+  max-width: 65%;
+  text-align: left;
+}
+
+.hero.block.overlay h1,
+.hero.block.overlay h2,
+.hero.block.overlay h3,
+.hero.block.overlay h4,
+.hero.block.overlay h5,
+.hero.block.overlay h6,
+.hero.block.overlay p {
+  text-align: left;
+  margin: 0 0 12px 0;
+  width: 100%;
+  max-width: none;
+}
+
+/* h2 vira tag/badge no overlay */
+.hero.block.overlay h2 {
+  display: inline-block;
+  background: var(--color-brand-live, #D85A30);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 3px;
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
+
+/* Remove o underline decorativo do h1 no overlay */
+.hero.block.overlay h1::after {
+  display: none;
 }
 
 /*button theme hero specific*/

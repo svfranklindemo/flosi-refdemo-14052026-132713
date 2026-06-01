@@ -106,6 +106,12 @@
   display: inline-flex;
   flex: 1;
   flex-direction: column;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.cards > ul > li:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 .cards > ul > li .cards-card-image {
   position: relative;
@@ -119,11 +125,11 @@
   bottom: 0;
   height: 25px;
   padding: 0 10px;
-  background: #151515;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 1px;
+  background: var(--main-accent-color, #12d8b1);
+  color: #131313;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
   text-transform: uppercase;
   display: flex;
   align-items: center;
@@ -140,11 +146,13 @@
 }
 
 .cards .cards-card-image .cards-card-tag.tag-mega-investiga {
-  background: #1ea98c;
+  background: #12d8b1;
+  color: #131313;
 }
 
 .cards .cards-card-image .cards-card-tag.tag-radio-infinita {
-  background: #1ea98c;
+  background: #12d8b1;
+  color: #131313;
 }
 
 .cards .cards-card-image .cards-card-tag.tag-ultimo-minuto {

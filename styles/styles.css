@@ -30,25 +30,25 @@
   --text-light: var(--brand-light-text-color, #ffffff);
   --text-disabled:rgb(113, 113, 113);
   --link-color: var(--brand-link-color, #131313);
-  --link-hover-color: var(--brand-link-hover-color, #F97316);
-  --main-accent-color: var(--brand-theme-color, #FB923C);
+  --link-hover-color: var(--brand-link-hover-color, #0fb89a);
+  --main-accent-color: var(--brand-theme-color, #12d8b1);
 
 
   --dark-color-opacity: rgba(0, 0, 0, 0.55);
   --light-color-opacity: rgba(255, 255, 255, 0.5);
   --tab-background-color: rgba(0, 0, 0, 0.02);
   /* brand-scoped header/footer variables with sensible defaults */
-  --nav-background-color: var(--brand-nav-background-color, #0000008c);
-  --nav-text-color: var(--brand-nav-text-color, #ffffff);
+  --nav-background-color: var(--brand-nav-background-color, #ffffff);
+  --nav-text-color: var(--brand-nav-text-color, #131313);
   --footer-background-color: var(--brand-footer-background-color, #000);
   --footer-text-color: var(--brand-footer-text-color, #ffffff);
   
   /* fonts */
-  --body-font-family: 'Adobe Clean', roboto, roboto-fallback, sans-serif;
-  --heading-font-family: 'Adobe Clean Bold', roboto-condensed, roboto-condensed-fallback, sans-serif;
-  --light-font-family: 'Adobe Clean Light', roboto, roboto-fallback, sans-serif;
-  --extra-font-family: 'Adobe Clean Extra Bold', roboto, roboto-fallback, sans-serif;
-  --black-font-family: 'Adobe Clean Black', roboto, roboto-fallback, sans-serif;
+  --body-font-family: 'Inter', roboto, roboto-fallback, sans-serif;
+  --heading-font-family: 'Inter', roboto-condensed, roboto-condensed-fallback, sans-serif;
+  --light-font-family: 'Inter', roboto, roboto-fallback, sans-serif;
+  --extra-font-family: 'Inter', roboto, roboto-fallback, sans-serif;
+  --black-font-family: 'Inter', roboto, roboto-fallback, sans-serif;
 
   /* body sizes */
   --body-font-size-m: 22px;
@@ -419,9 +419,32 @@ h6 {
   margin-top: 0.8em;
   margin-bottom: 0.25em;
   font-family: var(--heading-font-family);
-  font-weight: 600;
-  line-height: 1.25;
+  font-weight: 700;
+  line-height: 1.2;
   scroll-margin: 40px;
+}
+
+/* Section heading style — news portal accent */
+main > .section > div > h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--heading-font-size-m);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--dark-color);
+  margin-bottom: 1.25em;
+}
+
+main > .section > div > h2::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 1.1em;
+  background-color: var(--main-accent-color);
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 h1 {
@@ -1105,8 +1128,3 @@ table {
   transform: translateX(0);
 }
 
-/* Accessibility: darken default accent and hover for better contrast */
-:root {
-  --main-accent-color: #C2410C; /* darker orange for contrast */
-  --link-hover-color: #9A3412;  /* darker hover */
-}

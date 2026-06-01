@@ -45,8 +45,8 @@ export default function decorate(block) {
     const key = normalizeConfigKey(cells[0].textContent);
     const value = getConfigValue(cells[1]);
 
-    if (key === 'html') html = value;
-    if (key === 'css') css = value;
+    if (key === 'contenido' || key === 'html') html = value;
+    if (key === 'estilo' || key === 'css') css = value;
   });
 
   const uid = `html-css-${Math.random().toString(36).slice(2, 10)}`;

@@ -5800,16 +5800,16 @@
     "id": "html-css",
     "fields": [
       {
-        "component": "multiline",
-        "name": "html",
-        "label": "HTML",
+        "component": "text",
+        "name": "contenido",
+        "label": "Contenido",
         "valueType": "string",
         "value": ""
       },
       {
-        "component": "multiline",
-        "name": "css",
-        "label": "CSS",
+        "component": "text",
+        "name": "estilo",
+        "label": "Estilo",
         "valueType": "string",
         "value": ""
       }

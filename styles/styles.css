@@ -431,7 +431,9 @@ h6 {
 }
 
 /* Section heading style — news portal accent */
-main > .section > div > h2 {
+/* Shared block section title style — used by h2 direto e .block-section-title */
+main > .section > div > h2,
+main .block-section-title {
   display: inline-flex;
   align-items: center;
   gap: 12px;
@@ -443,7 +445,8 @@ main > .section > div > h2 {
   margin-bottom: 1.25em;
 }
 
-main > .section > div > h2::before {
+main > .section > div > h2::before,
+main .block-section-title::before {
   content: '';
   display: inline-block;
   width: 5px;

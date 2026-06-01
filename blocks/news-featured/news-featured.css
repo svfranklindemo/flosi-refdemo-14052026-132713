@@ -1,4 +1,4 @@
-/* ── Section header ─────────────────────────── */
+/* ── Header ──────────────────────────────────── */
 .news-featured .nf-header {
   display: flex;
   align-items: center;
@@ -6,19 +6,9 @@
   margin-bottom: 20px;
 }
 
+/* O h2.block-section-title já é estilizado pelo tema */
 .news-featured .nf-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--dark-color);
   white-space: nowrap;
-  text-transform: none;
-  letter-spacing: 0;
-  border: none;
-  padding: 0;
-}
-
-.news-featured .nf-title::before {
-  display: none;
 }
 
 .news-featured .nf-bar {
@@ -27,29 +17,28 @@
   background: #e0e0e0;
 }
 
-/* ── Grid layout ─────────────────────────────── */
+/* ── Grid ────────────────────────────────────── */
 .news-featured .nf-grid {
   display: grid;
   grid-template-columns: 1.6fr 1fr;
-  gap: 16px;
+  gap: 24px;
   align-items: start;
 }
 
-/* ── Card base: override global <a> styles ───── */
+/* ── Card base: reset global <a> styles ──────── */
 .news-featured .nf-card {
   display: flex !important;
   flex-direction: column;
   text-decoration: none !important;
   color: inherit !important;
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  overflow: hidden;
-  transition: box-shadow 0.2s ease;
   white-space: normal !important;
   text-overflow: unset !important;
   font-size: inherit !important;
   font-family: inherit !important;
   line-height: inherit !important;
+  border: none;
+  background: transparent;
+  transition: opacity 0.2s ease;
 }
 
 .news-featured .nf-card::after {
@@ -58,15 +47,16 @@
 }
 
 .news-featured .nf-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  opacity: 0.85;
   text-decoration: none !important;
 }
 
-/* ── Card image ──────────────────────────────── */
+/* ── Imagem ──────────────────────────────────── */
 .news-featured .nf-card-image {
   overflow: hidden;
-  background: linear-gradient(135deg, #e8f4f1 0%, #d4ece6 100%);
+  background: linear-gradient(135deg, #c8e6de 0%, #a8d5c8 100%);
   flex-shrink: 0;
+  border-radius: 6px;
 }
 
 .news-featured .nf-card-image img {
@@ -78,64 +68,74 @@
 }
 
 .news-featured .nf-card:hover .nf-card-image img {
-  transform: scale(1.04);
+  transform: scale(1.03);
 }
 
-/* ── Big card ────────────────────────────────── */
+/* ── Card grande (destaque) ──────────────────── */
 .news-featured .nf-card-big .nf-card-image {
-  height: 200px;
+  height: 220px;
+  border-radius: 6px;
 }
 
 .news-featured .nf-card-big .nf-card-body {
-  padding: 14px 16px 16px;
-  background: #fff;
+  padding: 14px 0 0;
 }
 
 .news-featured .nf-card-big .nf-card-title {
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.45;
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
   color: var(--dark-color);
   margin: 6px 0 8px;
-  display: block;
   white-space: normal;
 }
 
-/* ── Horizontal small cards ──────────────────── */
+/* ── Stack lateral ───────────────────────────── */
 .news-featured .nf-stack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 0;
 }
 
 .news-featured .nf-card-horiz {
   flex-direction: row !important;
-  align-items: stretch;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.news-featured .nf-stack .nf-card-horiz:first-child {
+  padding-top: 0;
+}
+
+.news-featured .nf-stack .nf-card-horiz:last-child {
+  border-bottom: none;
 }
 
 .news-featured .nf-card-horiz .nf-card-image {
-  width: 90px;
-  height: auto;
-  min-height: 72px;
+  width: 88px;
+  height: 66px;
+  flex-shrink: 0;
+  border-radius: 4px;
 }
 
 .news-featured .nf-card-horiz .nf-card-body {
-  padding: 10px 12px;
+  padding: 0 0 0 12px;
   flex: 1;
-  background: #fff;
 }
 
 .news-featured .nf-card-horiz .nf-card-title {
-  font-size: 12px;
-  font-weight: 500;
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
   line-height: 1.4;
   color: var(--dark-color);
-  margin: 4px 0 6px;
-  display: block;
+  margin: 3px 0 6px;
   white-space: normal;
 }
 
-/* ── Category label ──────────────────────────── */
+/* ── Categoria ───────────────────────────────── */
 .news-featured .nf-card-cat {
   display: inline-block;
   font-size: 9px;
@@ -143,7 +143,6 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--main-accent-color);
-  margin-bottom: 2px;
 }
 
 /* ── Timestamp ───────────────────────────────── */
@@ -151,7 +150,6 @@
   font-size: 10px;
   color: #999;
   display: block;
-  margin-top: 4px;
 }
 
 /* ── Responsive ──────────────────────────────── */
@@ -165,6 +163,7 @@
   }
 
   .news-featured .nf-card-horiz .nf-card-image {
-    width: 80px;
+    width: 72px;
+    height: 56px;
   }
 }

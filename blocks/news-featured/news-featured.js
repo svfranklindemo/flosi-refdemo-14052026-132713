@@ -256,8 +256,8 @@ export default async function decorate(block) {
   // Section header
   const header = document.createElement('div');
   header.className = 'nf-header';
-  const titleEl = document.createElement('span');
-  titleEl.className = 'nf-title';
+  const titleEl = document.createElement('h2');
+  titleEl.className = 'nf-title block-section-title';
   titleEl.textContent = sectionTitle;
   header.appendChild(titleEl);
   header.appendChild(Object.assign(document.createElement('span'), { className: 'nf-bar' }));

@@ -1,3 +1,9 @@
+/* Remove padding do wrapper para ticker full-width */
+.ticker-container .ticker-wrapper {
+  padding: 0;
+  max-width: unset;
+}
+
 .ticker {
   display: flex;
   align-items: center;

@@ -189,7 +189,7 @@ function renderNews(items, config, container) {
         ${news.image ? `<img src="${news.image}" alt="${news.title}" loading="lazy">` : '<div class="news-card-image-placeholder"></div>'}
       </div>
       <div class="news-card-body">
-        `<span class="news-card-category news-cat-badge" data-category="${(news.category || 'Nacional').toLowerCase()}">${news.category || 'Nacional'}</span>`
+        <span class="news-card-category news-cat-badge" data-category="${(news.category || 'Nacional').toLowerCase()}">${news.category || 'Nacional'}</span>
         <p class="news-card-title">${news.title}</p>
         ${news.description ? `<p class="news-card-description">${news.description}</p>` : ''}
         ${ago ? `<span class="news-card-meta">${ago}</span>` : ''}

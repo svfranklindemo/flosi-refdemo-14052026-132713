@@ -155,14 +155,23 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
 
 /* brand */
 header .nav-brand {
-  grid-area: brand;
   flex-shrink: 0;
+  align-self: center;
   display: flex;
   align-items: center;
   font-size: var(--heading-font-size-s);
   font-weight: 700;
   line-height: 1;
   margin-right: 32px;
+}
+
+header .nav-brand p,
+header .nav-brand a {
+  display: flex;
+  align-items: center;
+  line-height: 0;
+  margin: 0;
+  padding: 0;
 }
 
 .wehealthcare-theme header .nav-brand {

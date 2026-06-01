@@ -129,9 +129,12 @@ function resolveNewsLink(slug, detailBasePath) {
   const pathSegments = currentPath.split('/').filter(Boolean);
   const firstSeg = pathSegments[0] || '';
   const lastSeg = pathSegments[pathSegments.length - 1] || '';
+  const htmlLang = (document?.documentElement?.lang || '').toLowerCase().trim();
+  const langFallback = htmlLang.split('-')[0] || '';
   const localeSegment = /^[a-z]{2}(?:-[a-z]{2})?$/i.test(firstSeg)
     ? firstSeg
-    : (lastSeg.match(/^([a-z]{2}(?:-[a-z]{2})?)$/i)?.[1] || '');
+    : (lastSeg.match(/^([a-z]{2}(?:-[a-z]{2})?)$/i)?.[1]
+      || (langFallback.match(/^[a-z]{2}$/i)?.[0] || ''));
   let finalBase = rawBase.replace(/\/+$/g, '') || '/news';
 
   if (finalBase.startsWith('/content/')) {

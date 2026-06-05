@@ -312,12 +312,6 @@ function renderNewsDetail(block, item) {
         </div>
       </div>
 
-      ${item.image ? `
-        <div class="news-detail-image">
-          <img src="${item.image}" alt="${item.title}">
-        </div>
-      ` : ''}
-
       ${item.audio ? `
         <div class="news-detail-audio">
           <div class="news-detail-audio-label">
@@ -328,6 +322,12 @@ function renderNewsDetail(block, item) {
             <source src="${item.audio}" type="audio/wav">
             <source src="${item.audio}" type="audio/mpeg">
           </audio>
+        </div>
+      ` : ''}
+
+      ${item.image ? `
+        <div class="news-detail-image">
+          <img src="${item.image}" alt="${item.title}">
         </div>
       ` : ''}
       ${item.content ? `<div class="news-detail-content"${buildAueAttrs(item.id, 'content', 'richtext')}>${item.content}</div>` : ''}

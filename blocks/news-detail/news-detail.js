@@ -136,6 +136,7 @@ function normalizeNewsFromGraphql(item) {
     category: readValue(item.category) || '',
     slug: String(item.slug || '').trim(),
     image: readValue(item.media) || '',
+    audio: readValue(item.audio) || '',
     createdAt: readValue(item.createdAt) || '',
     updatedAt: readValue(item.updatedAt) || '',
     publishedAt: readValue(item.publishedAt) || '',
@@ -310,6 +311,19 @@ function renderNewsDetail(block, item) {
           <a class="news-detail-share-link" href="https://www.facebook.com/sharer/sharer.php?u=${pageUrl}" target="_blank" rel="noopener" title="Facebook">f</a>
         </div>
       </div>
+
+      ${item.audio ? `
+        <div class="news-detail-audio">
+          <div class="news-detail-audio-label">
+            <span class="news-detail-audio-icon">▶</span>
+            Escucha el resumen
+          </div>
+          <audio controls preload="metadata" class="news-detail-audio-player">
+            <source src="${item.audio}" type="audio/wav">
+            <source src="${item.audio}" type="audio/mpeg">
+          </audio>
+        </div>
+      ` : ''}
 
       ${item.image ? `
         <div class="news-detail-image">

@@ -174,12 +174,12 @@ function timeAgo(dateStr) {
   const diff = Date.now() - Date.parse(dateStr);
   if (Number.isNaN(diff) || diff < 0) return '';
   const min = Math.floor(diff / 60000);
-  if (min < 1) return 'Ahora';
-  if (min < 60) return `Hace ${min} min`;
+  if (min < 1) return 'Now';
+  if (min < 60) return `${min} min ago`;
   const h = Math.floor(min / 60);
-  if (h < 24) return `Hace ${h} h`;
+  if (h < 24) return `${h}h ago`;
   const d = Math.floor(h / 24);
-  return `Hace ${d} día${d !== 1 ? 's' : ''}`;
+  return `${d} day${d !== 1 ? 's' : ''} ago`;
 }
 
 function renderNews(items, config, container) {
@@ -198,7 +198,7 @@ function renderNews(items, config, container) {
         ${news.image ? `<img src="${news.image}" alt="${news.title}" loading="lazy">` : '<div class="news-card-image-placeholder"></div>'}
       </div>
       <div class="news-card-body">
-        <span class="news-card-category news-cat-badge" data-category="${(news.category || 'Nacional').toLowerCase()}">${news.category || 'Nacional'}</span>
+        <span class="news-card-category news-cat-badge" data-category="${(news.category || 'National').toLowerCase()}">${news.category || 'National'}</span>
         <p class="news-card-title">${news.title}</p>
         ${news.description ? `<p class="news-card-description">${news.description}</p>` : ''}
         ${ago ? `<span class="news-card-meta">${ago}</span>` : ''}
@@ -265,14 +265,14 @@ async function fetchNewsFromStaticJson(edgeDataPath) {
 }
 
 export default async function decorate(block) {
-  let title = 'Últimas Notícias';
+  let title = 'Latest News';
   let subtitle = 'Confira as notícias mais recentes';
   let contentFragmentFolder = '';
   let maxItems = 6;
   let ctaLabel = 'Ver detalhes';
   let detailBasePath = '/news';
   let allNewsPath = '/en/news-all';
-  let emptyStateText = 'Nenhuma notícia encontrada.';
+  let emptyStateText = 'No news found.';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
   let authorGraphqlEndpoint = '';
   let edgeDataPath = '/news-data.json';
@@ -317,10 +317,10 @@ export default async function decorate(block) {
 
   const header = createElement('div', 'block-news-header', `
     <h2 class="block-news-title block-section-title">${title}</h2>
-    <a class="block-news-ver-todas" href="${allNewsPath}">Ver todas →</a>
+    <a class="block-news-ver-todas" href="${allNewsPath}">See all →</a>
   `);
   const list = createElement('div', 'news-feed-results');
-  list.innerHTML = '<p class="news-feed-loading">Carregando notícias...</p>';
+  list.innerHTML = '<p class="news-feed-loading">Loading news...</p>';
   block.append(header, list);
 
   if (!contentFragmentFolder) {
@@ -369,6 +369,6 @@ export default async function decorate(block) {
       list.append(info);
     }
   } catch (e) {
-    list.innerHTML = `<p class="news-feed-error">Erro ao carregar notícias: ${e?.message || 'unknown'}</p>`;
+    list.innerHTML = `<p class="news-feed-error">Error loading news: ${e?.message || 'unknown'}</p>`;
   }
 }

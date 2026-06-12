@@ -460,12 +460,18 @@ main .block-section-title::before {
    Used by news-detail, news-feed, news-featured
    Applied via data-category attribute on the badge/label
 */
-[data-category="nacional"]        { --cat-color: #085041; --cat-bg: #E1F5EE; }
-[data-category="política"]        { --cat-color: #1e40af; --cat-bg: #dbeafe; }
-[data-category="mega investiga"]  { --cat-color: #6d28d9; --cat-bg: #ede9fe; }
-[data-category="deportes"]        { --cat-color: #b45309; --cat-bg: #fef3c7; }
-[data-category="economía"]        { --cat-color: #0e7490; --cat-bg: #cffafe; }
-[data-category="entretenimiento"] { --cat-color: #be185d; --cat-bg: #fce7f3; }
+[data-category="nacional"],
+[data-category="national"]        { --cat-color: #085041; --cat-bg: #E1F5EE; }
+[data-category="política"],
+[data-category="politics"]        { --cat-color: #1e40af; --cat-bg: #dbeafe; }
+[data-category="mega investiga"],
+[data-category="mega investigates"] { --cat-color: #6d28d9; --cat-bg: #ede9fe; }
+[data-category="deportes"],
+[data-category="sports"]          { --cat-color: #b45309; --cat-bg: #fef3c7; }
+[data-category="economía"],
+[data-category="economy"]         { --cat-color: #0e7490; --cat-bg: #cffafe; }
+[data-category="entretenimiento"],
+[data-category="entertainment"]   { --cat-color: #be185d; --cat-bg: #fce7f3; }
 
 .news-cat-badge {
   display: inline-block;

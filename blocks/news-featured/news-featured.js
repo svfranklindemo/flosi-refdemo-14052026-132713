@@ -185,12 +185,12 @@ function timeAgo(dateStr) {
   const diff = Date.now() - Date.parse(dateStr);
   if (Number.isNaN(diff) || diff < 0) return '';
   const min = Math.floor(diff / 60000);
-  if (min < 1) return 'Ahora';
-  if (min < 60) return `Hace ${min} min`;
+  if (min < 1) return 'Now';
+  if (min < 60) return `${min} min ago`;
   const h = Math.floor(min / 60);
-  if (h < 24) return `Hace ${h} h`;
+  if (h < 24) return `${h}h ago`;
   const d = Math.floor(h / 24);
-  return `Hace ${d} día${d !== 1 ? 's' : ''}`;
+  return `${d} day${d !== 1 ? 's' : ''} ago`;
 }
 
 // ── DOM builders ──────────────────────────────────────────────────────────────
@@ -211,7 +211,7 @@ function buildBody(news, titleTag, detailBasePath, showDescription = false) {
   const body = document.createElement('div');
   body.className = 'nf-card-body';
 
-  const displayCat = news.category || 'Nacional';
+  const displayCat = news.category || 'National';
   const cat = document.createElement('span');
   cat.className = 'nf-card-cat news-cat-badge';
   cat.dataset.category = displayCat.toLowerCase();
@@ -267,7 +267,7 @@ export default async function decorate(block) {
   let allNewsPath = '/en/news-all';
   let persistedQueryPath = 'ref-demo-eds/news-by-folder';
   let authorGraphqlEndpoint = '';
-  let sectionTitle = 'Noticias destacadas';
+  let sectionTitle = 'Featured News';
 
   [...block.children].forEach((row) => {
     const [keyCell, valueCell] = row.children;
@@ -296,7 +296,7 @@ export default async function decorate(block) {
   }
 
   // Loading state
-  block.innerHTML = '<p class="nf-loading">Carregando...</p>';
+  block.innerHTML = '<p class="nf-loading">Loading...</p>';
 
   let items = [];
   try {
@@ -329,7 +329,7 @@ export default async function decorate(block) {
   const verTodas = document.createElement('a');
   verTodas.className = 'block-news-ver-todas';
   verTodas.href = allNewsPath;
-  verTodas.textContent = 'Ver todas →';
+  verTodas.textContent = 'See all →';
   header.appendChild(verTodas);
   block.appendChild(header);
 

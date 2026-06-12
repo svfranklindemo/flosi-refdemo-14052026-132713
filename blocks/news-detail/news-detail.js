@@ -286,7 +286,7 @@ function renderNewsDetail(block, item) {
   block.innerHTML = `
     ${breadcrumb}
     <article class="news-detail-article"${referenceAue}>
-      <p class="news-detail-category news-cat-badge" data-category="${(item.category || 'Nacional').toLowerCase()}"${buildAueAttrs(item.id, 'category')}>${item.category || 'Nacional'}</p>
+      <p class="news-detail-category news-cat-badge" data-category="${(item.category || 'National').toLowerCase()}"${buildAueAttrs(item.id, 'category')}>${item.category || 'National'}</p>
       <h1 class="news-detail-title"${buildAueAttrs(item.id, 'title')}>${item.title}</h1>
       ${item.description ? `<p class="news-detail-description"${buildAueAttrs(item.id, 'description', 'richtext')}>${item.description}</p>` : ''}
 
@@ -302,10 +302,10 @@ function renderNewsDetail(block, item) {
         ` : ''}
         <div class="news-detail-meta">
           ${created ? `<span class="news-detail-meta-item">${created}</span>` : ''}
-          ${showUpdated && updatedAgo ? `<span class="news-detail-meta-item">Actualizado ${updatedAgo}</span>` : ''}
+          ${showUpdated && updatedAgo ? `<span class="news-detail-meta-item">Updated ${updatedAgo}</span>` : ''}
         </div>
-        <div class="news-detail-share" aria-label="Compartir">
-          <span class="news-detail-share-label">Compartir</span>
+        <div class="news-detail-share" aria-label="Share">
+          <span class="news-detail-share-label">Share</span>
           <a class="news-detail-share-link" href="https://twitter.com/intent/tweet?url=${pageUrl}&text=${pageTitle}" target="_blank" rel="noopener" title="Twitter/X">𝕏</a>
           <a class="news-detail-share-link" href="https://api.whatsapp.com/send?text=${pageTitle}%20${pageUrl}" target="_blank" rel="noopener" title="WhatsApp">W</a>
           <a class="news-detail-share-link" href="https://www.facebook.com/sharer/sharer.php?u=${pageUrl}" target="_blank" rel="noopener" title="Facebook">f</a>
@@ -316,7 +316,7 @@ function renderNewsDetail(block, item) {
         <div class="news-detail-audio">
           <div class="news-detail-audio-label">
             <span class="news-detail-audio-icon">▶</span>
-            Escucha el resumen
+            Listen to the summary
           </div>
           <audio controls preload="metadata" class="news-detail-audio-player">
             <source src="${item.audio}" type="audio/wav">

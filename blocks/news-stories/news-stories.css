@@ -105,6 +105,12 @@
   transition: opacity 0.2s ease;
 }
 
+/* When closed, fully remove the overlay so it never covers the page or
+   intercepts clicks. Must beat the base rule's display:flex. */
+.news-stories .news-stories-viewer[hidden] {
+  display: none;
+}
+
 .news-stories .news-stories-viewer.is-open {
   opacity: 1;
 }

@@ -251,6 +251,7 @@ function renderHighlights(groups, block, openViewer) {
       img.src = cover;
       img.alt = '';
       img.loading = 'lazy';
+      img.decoding = 'async';
       thumb.append(img);
     } else {
       thumb.textContent = (group.label || '?').charAt(0).toUpperCase();

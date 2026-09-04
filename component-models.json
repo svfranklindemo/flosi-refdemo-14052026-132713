@@ -5968,6 +5968,86 @@
     ]
   },
   {
+    "id": "news-stories",
+    "fields": [
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "title",
+        "label": "Title",
+        "description": "Optional heading shown above the highlights. Leave empty to hide.",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "categories",
+        "label": "Categories",
+        "description": "Comma-separated categories to show as highlights (e.g. Deportes, Economía). Leave empty to auto-detect from the data.",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "latestLabel",
+        "label": "Latest Highlight Label",
+        "value": "Latest"
+      },
+      {
+        "component": "number",
+        "name": "maxPerStory",
+        "label": "Max News Per Story",
+        "valueType": "number",
+        "value": 6
+      },
+      {
+        "component": "number",
+        "name": "storyDuration",
+        "label": "Story Duration (ms)",
+        "valueType": "number",
+        "value": 5000
+      },
+      {
+        "component": "aem-content",
+        "name": "contentFragmentFolder",
+        "label": "Content Fragment Folder",
+        "description": "Folder containing News content fragments (used on Author via GraphQL).",
+        "valueType": "string",
+        "validation": {
+          "rootPath": "/content/dam"
+        }
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "detailBasePath",
+        "label": "Detail Base Path",
+        "value": "/news"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "persistedQueryPath",
+        "label": "Persisted Query Path",
+        "value": "ref-demo-eds/news-by-folder"
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "authorGraphqlEndpoint",
+        "label": "Author GraphQL Endpoint Base (optional)",
+        "value": ""
+      },
+      {
+        "component": "text",
+        "valueType": "string",
+        "name": "edgeDataPath",
+        "label": "Edge Static Data Path",
+        "value": "/news-data.json"
+      }
+    ]
+  },
+  {
     "id": "quote",
     "fields": [
       {

@@ -282,10 +282,29 @@
 
 /* ── Mobile: full-bleed ─────────────────────────────────────── */
 @media (width <= 600px) {
+  .news-stories .news-stories-viewer {
+    height: 100vh; /* fallback */
+    height: 100dvh; /* excludes the browser chrome so nothing is cut off */
+  }
+
   .news-stories .news-stories-stage {
     width: 100vw;
-    height: 100vh;
+    height: 100vh; /* fallback */
+    height: 100dvh;
     max-height: none;
     border-radius: 0;
+  }
+
+  /* keep the top controls and bottom CTA clear of notch / home indicator */
+  .news-stories .news-stories-progress {
+    top: calc(10px + env(safe-area-inset-top));
+  }
+
+  .news-stories .news-stories-topbar {
+    top: calc(20px + env(safe-area-inset-top));
+  }
+
+  .news-stories .news-stories-slide-body {
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
   }
 }

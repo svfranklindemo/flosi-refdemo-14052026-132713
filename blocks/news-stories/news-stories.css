@@ -116,8 +116,7 @@
   }
 
   .news-stories .news-stories-highlights {
-    flex: 1;
-    justify-content: space-between;
+    gap: 24px;
     overflow: visible;
   }
 }

@@ -235,7 +235,7 @@ function buildGroups(items, config) {
 }
 
 // ── Highlights row ──────────────────────────────────────────────────────────
-function renderHighlights(groups, block, openViewer) {
+function renderHighlights(groups, parent, openViewer) {
   const row = createElement('div', 'news-stories-highlights');
   groups.forEach((group, index) => {
     const cover = group.items.find((n) => n.image)?.image || '';
@@ -266,7 +266,7 @@ function renderHighlights(groups, block, openViewer) {
     btn.addEventListener('click', () => openViewer(index, 0));
     row.append(btn);
   });
-  block.append(row);
+  parent.append(row);
 }
 
 // ── Fullscreen viewer ───────────────────────────────────────────────────────
@@ -512,13 +512,6 @@ export default async function decorate(block) {
   block.innerHTML = '';
   block.classList.add('news-stories');
 
-  if (config.title) {
-    const header = createElement('div', 'block-news-header', `
-      <h2 class="block-news-title block-section-title">${config.title}</h2>
-    `);
-    block.append(header);
-  }
-
   const loading = createElement('p', 'news-stories-loading', 'Loading stories...');
   block.append(loading);
 
@@ -543,6 +536,16 @@ export default async function decorate(block) {
   const groups = buildGroups(items, config);
   if (!groups.length) { block.hidden = true; return; }
 
+  // Bar groups the title (left) and the highlights (right, distributed) on one
+  // line for desktop; it stacks on tablet/mobile via CSS.
+  const bar = createElement('div', 'news-stories-bar');
+  if (config.title) {
+    const heading = createElement('h2', 'news-stories-heading block-section-title');
+    heading.textContent = config.title;
+    bar.append(heading);
+  }
+  block.append(bar);
+
   const openViewer = createViewer(groups, config, block);
-  renderHighlights(groups, block, openViewer);
+  renderHighlights(groups, bar, openViewer);
 }

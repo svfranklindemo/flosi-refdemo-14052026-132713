@@ -10,6 +10,20 @@
   font-size: var(--body-font-size-xs, 14px);
 }
 
+/* ── Bar: title + highlights ────────────────────────────────── */
+
+/* Stacked by default (mobile/tablet): title on top, highlights below. */
+.news-stories .news-stories-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.news-stories .news-stories-heading {
+  margin: 0;
+  white-space: nowrap;
+}
+
 /* ── Highlights row ─────────────────────────────────────────── */
 .news-stories .news-stories-highlights {
   display: flex;
@@ -90,6 +104,22 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Desktop: title on the left, highlights fill the rest of the line,
+   distributed horizontally. Below 900px it stays stacked (rules above). */
+@media (width >= 900px) {
+  .news-stories .news-stories-bar {
+    flex-direction: row;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .news-stories .news-stories-highlights {
+    flex: 1;
+    justify-content: space-between;
+    overflow: visible;
+  }
 }
 
 /* ── Fullscreen viewer ──────────────────────────────────────── */

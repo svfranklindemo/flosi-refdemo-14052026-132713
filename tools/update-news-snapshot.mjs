@@ -149,6 +149,7 @@ async function run() {
         plaintext: item?.description?.plaintext || '',
       },
       media: masterData.media,
+      audio: item?.audio?._path ? `${origin}${item.audio._path}` : '',
       content: masterData.content || '',
       createdAt,
       updatedAt,
